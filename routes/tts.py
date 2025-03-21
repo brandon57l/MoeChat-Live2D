@@ -5,7 +5,7 @@ import soundfile as sf
 from kokoro import KPipeline
 import torch
 
-pipeline = KPipeline(lang_code='a')
+pipeline = KPipeline(lang_code='z')
 
 def init_kokoro(app):
     @app.route('/synthesize', methods=['POST'])
