@@ -2,7 +2,10 @@ from flask import Flask, request, send_file, jsonify
 from flask_cors import CORS
 import io
 import soundfile as sf
+from kokoro import KPipeline
+import torch
 
+pipeline = KPipeline(lang_code='a')
 
 def init_kokoro(app):
     @app.route('/synthesize', methods=['POST'])
