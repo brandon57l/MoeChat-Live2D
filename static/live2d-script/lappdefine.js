@@ -1,7 +1,7 @@
 import { LogLevel } from './framework/src/live2dcubismframework.js';
 export const CanvasSize = 'auto';
 export const CanvasNum = 1;
-export const ViewScale = 1.0;
+export const ViewScale = 0.8;
 export const ViewMaxScale = 2.0;
 export const ViewMinScale = 0.8;
 export const ViewLogicalLeft = -1.0;
@@ -12,12 +12,15 @@ export const ViewLogicalMaxLeft = -2.0;
 export const ViewLogicalMaxRight = 2.0;
 export const ViewLogicalMaxBottom = -2.0;
 export const ViewLogicalMaxTop = 2.0;
-export const ResourcesPath = '../../Resources/';
+export const ResourcesPath = 'static/Resources/';
 export const BackImageName = 'back_class_normal.png';
+export const BackColor = [0.0, 0.0, 0.0, 0.0];
 export const GearImageName = 'icon_gear.png';
 export const PowerImageName = 'CloseNormal.png';
 export const ModelDir = [
+    // 'haru_seifuku',
     'Haru',
+    // 'haru_co',
     'Hiyori',
     'Mark',
     'Natori',

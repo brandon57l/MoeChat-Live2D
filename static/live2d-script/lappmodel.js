@@ -22,6 +22,9 @@ import * as LAppDefine from './lappdefine.js';
 import { LAppPal } from './lapppal.js';
 import { LAppWavFileHandler } from './lappwavfilehandler.js';
 import { CubismMoc } from './framework/src/model/cubismmoc.js';
+
+
+
 var LoadStep;
 (function (LoadStep) {
     LoadStep[LoadStep["LoadAssets"] = 0] = "LoadAssets";
@@ -56,6 +59,7 @@ export class LAppModel extends CubismUserModel {
             console.error('Erreur lors de la lecture audio:', err);
         });
     }
+
     loadAssets(dir, fileName) {
         this._modelHomeDir = dir;
         fetch(`${this._modelHomeDir}${fileName}`)
@@ -346,19 +350,21 @@ export class LAppModel extends CubismUserModel {
         if (this._physics != null) {
             this._physics.evaluate(this._model, deltaTimeSeconds);
         }
+
+
         let rmsValue = 0.0;
         rmsValue = this._wavFileHandler.getRms();
         console.log(`RMS value : ${rmsValue}`);
         if (this._lipsync) {
             let value = 0.0;
             this._wavFileHandler.update(deltaTimeSeconds);
-            value = this._wavFileHandler.getRms();
+            value = this._wavFileHandler.getRms()*3;
             for (let i = 0; i < this._lipSyncIds.getSize(); ++i) {
-                this._model.addParameterValueById(this._lipSyncIds.at(i), value, 0.8);
+                this._model.addParameterValueById(this._lipSyncIds.at(i), value, 1.0);
             }
         }
         if (this._userTimeSeconds - this._lastAudioPlayTime >= this._audioPlayInterval) {
-            this.startLive2DSpeech(this._audioUrl);
+            // this.startLive2DSpeech(this._audioUrl);
             this._lastAudioPlayTime = this._userTimeSeconds;
         }
         if (this._pose != null) {
@@ -559,7 +565,7 @@ export class LAppModel extends CubismUserModel {
         super();
         this._lastAudioPlayTime = 0;
         this._audioPlayInterval = 10;
-        this._audioUrl = "/audio/hello-my-name-is.wav";
+        this._audioUrl = "/static/audio/hello-my-name-is.wav";
         this._modelSetting = null;
         this._modelHomeDir = null;
         this._userTimeSeconds = 0.0;

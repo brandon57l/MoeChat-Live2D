@@ -5,6 +5,7 @@ import { LAppPal } from './lapppal.js';
 import { LAppSubdelegate } from './lappsubdelegate.js';
 import { CubismLogError } from './framework/src/utils/cubismdebug.js';
 export let s_instance = null;
+
 export class LAppDelegate {
     static getInstance() {
         if (s_instance == null) {

@@ -4,8 +4,13 @@ import * as LAppDefine from './lappdefine.js';
 import { LAppModel } from './lappmodel.js';
 import { LAppPal } from './lapppal.js';
 
+
+import { fetchTTS } from "../js/ttshandler.js";
+import { fetchLLM } from "../js/llmhandler.js";
+
 export class LAppLive2DManager {
     static instance = null;
+    
 
     static getInstance() {
         if (!LAppLive2DManager.instance) {
@@ -14,11 +19,16 @@ export class LAppLive2DManager {
         return LAppLive2DManager.instance;
     }
     
+    // Retourne l'instance du modèle Live2D
+    getModel() {
+        return this._models.at(0) || null;
+    }
+
     releaseAllModel() {
         this._models.clear();
     }
     onDrag(x, y) {
-        const model = this._models.at(0);
+        const model = this.getModel();
         if (model) {
             model.setDragging(x, y);
         }
@@ -27,7 +37,7 @@ export class LAppLive2DManager {
         if (LAppDefine.DebugLogEnable) {
             LAppPal.printMessage(`[APP]tap point: {x: ${x.toFixed(2)} y: ${y.toFixed(2)}}`);
         }
-        const model = this._models.at(0);
+        const model = this.getModel();
         if (model.hitTest(LAppDefine.HitAreaNameHead, x, y)) {
             if (LAppDefine.DebugLogEnable) {
                 LAppPal.printMessage(`[APP]hit area: [${LAppDefine.HitAreaNameHead}]`);
@@ -38,13 +48,18 @@ export class LAppLive2DManager {
             if (LAppDefine.DebugLogEnable) {
                 LAppPal.printMessage(`[APP]hit area: [${LAppDefine.HitAreaNameBody}]`);
             }
-            model.startRandomMotion(LAppDefine.MotionGroupTapBody, LAppDefine.PriorityNormal, this.finishedMotion, this.beganMotion);
+            model.startRandomMotion(
+                LAppDefine.MotionGroupTapBody,
+                LAppDefine.PriorityNormal,
+                this.finishedMotion,
+                this.beganMotion
+            );
         }
     }
     onUpdate() {
         const { width, height } = this._subdelegate.getCanvas();
         const projection = new CubismMatrix44();
-        const model = this._models.at(0);
+        const model = this.getModel();
         if (model.getModel()) {
             if (model.getModel().getCanvasWidth() > 1.0 && width < height) {
                 model.getModelMatrix().setWidth(2.0);
@@ -71,8 +86,7 @@ export class LAppLive2DManager {
         }
         const model = LAppDefine.ModelDir[index];
         const modelPath = LAppDefine.ResourcesPath + model + '/';
-        let modelJsonName = LAppDefine.ModelDir[index];
-        modelJsonName += '.model3.json';
+        let modelJsonName = LAppDefine.ModelDir[index] + '.model3.json';
         this.releaseAllModel();
         const instance = new LAppModel();
         instance.setSubdelegate(this._subdelegate);
@@ -88,6 +102,7 @@ export class LAppLive2DManager {
         this._sceneIndex = sceneIndex;
         this.changeScene(this._sceneIndex);
     }
+
     constructor() {
         this.beganMotion = (self) => {
             LAppPal.printMessage('Motion Began:');
@@ -102,10 +117,43 @@ export class LAppLive2DManager {
         this._models = new csmVector();
         this._sceneIndex = 0;
     }
+    
     release() { }
     initialize(subdelegate) {
         this._subdelegate = subdelegate;
         this.changeScene(this._sceneIndex);
+    
+        // Conserver la référence à l'instance courante
+        const manager = this;
+    
+        $("#message-form").submit(async (event) => {
+            event.preventDefault(); // Empêche la soumission classique du formulaire
+    
+            try {
+                const llmResponse = await fetchLLM();
+                
+                if (!llmResponse || typeof llmResponse !== "string") {
+                    console.error("fetchLLM() n'a pas renvoyé un texte valide.");
+                    return;
+                }
+    
+                // Récupère l'instance du modèle via le manager
+                const model = manager.getModel();
+                if (!model) {
+                    console.error("Aucun modèle Live2D n'a été chargé !");
+                    return;
+                }
+    
+                // Appel de la synthèse vocale
+                fetchTTS(llmResponse,model);
+                
+            } catch (error) {
+                console.error("Erreur lors de l'appel à fetchLLM() :", error);
+            }
+        });
     }
+    
 }
 //# sourceMappingURL=lapplive2dmanager.js.map
+
+

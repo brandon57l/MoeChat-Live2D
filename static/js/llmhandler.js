@@ -1,0 +1,152 @@
+// Variable globale pour stocker l'historique de la conversation
+var conversationHistory = [];
+
+export async function fetchLLM() {
+    // Récupère et vérifie le message
+    var messageText = $("#message-input").val().trim();
+    if (messageText === "") return;
+
+    // Ajoute le message de l'utilisateur à l'historique
+    conversationHistory.push({ text: "User : "+messageText, sender: "user" });
+
+    // Affichage immédiat du message envoyé
+    var sentMessageHtml = `
+    <div class="d-flex flex-column align-items-end">
+        <div class="message sent shadow-box">
+            <div class="mb-0">${messageText}</div>
+        </div>
+    </div>`;
+    $("#chat-box").append(sentMessageHtml);
+    $("#chat-box").animate({ scrollTop: $("#chat-box")[0].scrollHeight }, 500);
+    $("#message-input").val(""); // Efface le champ de saisie
+
+    // Prépare l'historique à envoyer
+    var historyToSend = JSON.stringify(
+        conversationHistory.map(function (msg) {
+            return { text: msg.text };
+        })
+    );
+
+    // Effectue la requête AJAX de manière asynchrone
+    try {
+        let data = await $.ajax({
+            url: "send_message", // Assurez-vous que l'URL est correcte
+            type: "POST",
+            data: { message: messageText, history: historyToSend },
+        });
+
+        if (data.gemini_response) {
+            var geminiResponseText = data.gemini_response.parts[0].text;
+
+
+            // Enlève les balises ```json et ``` si elles sont présentes
+            geminiResponseText = geminiResponseText.replace("```json", "").replace("```", "").trim();
+
+            // Tente de parser la réponse JSON
+            try {
+                const jsonResponse = JSON.parse(geminiResponseText);
+
+                // Partie du code dans le try qui traite la réponse JSON
+                if (jsonResponse.hasOwnProperty('cn') && jsonResponse.hasOwnProperty('en') && jsonResponse.hasOwnProperty('fr')) {
+                    const cnText = jsonResponse.cn; // Récupère le texte chinois
+                    const enText = jsonResponse.en; // Récupère le texte anglais
+                    const frText = jsonResponse.fr; // Récupère le texte français
+
+                    // Affichage du message avec animation améliorée
+                    var receivedMessageHtml = `
+                        <div class="d-flex flex-column align-items-start">
+                            <div class="message received" style="cursor: pointer;">
+                                <div class="mb-0">
+                                    <div class="cn-text" style="display:block">${cnText}</div>
+                                    <div class="translations" style="color:#dce1de">
+                                        <!--🇬🇧 : ${enText}
+                                        <br>-->
+                                        🇫🇷 : ${frText}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>`;
+
+                    // Ajout du message au chat
+                    $("#chat-box").append(receivedMessageHtml);
+
+                    // Animation du scroll améliorée
+                    $("#chat-box").animate({ scrollTop: $("#chat-box")[0].scrollHeight }, { duration: 300, queue: false });
+
+                    $("#chat-box .message.received").last().on("click", function() {
+                        var translations = $(this).find(".translations");
+                    
+                        if (translations.hasClass("show")) {
+                            // Masquage de l'élément : on fixe la hauteur, puis on la ramène à 0
+                            translations.css("max-height", translations[0].scrollHeight + "px"); // Fixe la hauteur actuelle
+                            setTimeout(() => {
+                                translations.css({ "max-height": "0", "opacity": "0" });
+                            }, 10);
+                        
+                            // Après la fin de la transition, on cache complètement l'élément
+                            setTimeout(() => {
+                                translations.css("display", "none");
+                                translations.removeClass("show");
+                            }, 300); // Durée de la transition (doit correspondre à celle du CSS)
+                        } else {
+                            // Affichage de l'élément : on démarre avec display block mais avec max-height et opacité à 0
+                            translations.css({ "display": "block", "max-height": "0", "opacity": "0" });
+                            
+                            // Forcer une reflow pour que le navigateur prenne bien en compte l'état initial
+                            translations[0].offsetHeight;
+                        
+                            // Ensuite, on déclenche la transition pour que l'élément se déploie et s'affiche en fondu
+                            setTimeout(() => {
+                                translations.css({ "max-height": translations[0].scrollHeight + "px", "opacity": "1" });
+                            }, 10);
+                            translations.addClass("show");
+                        }
+                        
+                    });
+                    
+                    
+                    
+
+
+                    // Met à jour l'historique avec la réponse de Gemini (JSON entière)
+                    conversationHistory.push({ text: "Haru : "+cnText, sender: "gemini" });  // Stocke le JSON
+
+                    console.log("Réponse JSON de Gemini:", jsonResponse);
+                    return cnText;
+                }
+                else {
+                    console.error("Réponse JSON incomplète. Clés 'cn', 'en', ou 'fr' manquantes.");
+                    // Gérer le cas où le JSON est incomplet (afficher un message d'erreur, utiliser une valeur par défaut, etc.)
+                    var receivedMessageHtml = `
+                        <div class="d-flex flex-column align-items-start">
+                            <div class="message received">
+                                <div class="mb-0">Erreur: Réponse incomplète du chatbot.</div>
+                            </div>
+                        </div>`;
+                    $("#chat-box").append(receivedMessageHtml);
+                    $("#chat-box").animate({ scrollTop: $("#chat-box")[0].scrollHeight }, 500);
+                    conversationHistory.push({ text: "Réponse JSON incomplète du chatbot.", sender: "gemini" });
+                    return null;
+                }
+
+            } catch (error) {
+                console.error("Erreur lors de l'analyse de la réponse JSON:", error);
+
+                // Afficher l'erreur à l'utilisateur
+                var receivedMessageHtml = `
+                    <div class="d-flex flex-column align-items-start">
+                        <div class="message received">
+                            <div class="mb-0">Erreur: Impossible de comprendre la réponse du chatbot.  Réponse brute: ${geminiResponseText}</div>
+                        </div>
+                    </div>`;
+                $("#chat-box").append(receivedMessageHtml);
+                $("#chat-box").animate({ scrollTop: $("#chat-box")[0].scrollHeight }, 500);
+                conversationHistory.push({ text: "Erreur lors de l'analyse de la réponse JSON. Réponse brute:" + geminiResponseText, sender: "gemini" }); // Stocke la reponse brute
+                return null;
+            }
+        }
+    } catch (error) {
+        console.log("Une erreur est survenue lors de l'envoi du message.", error);
+        return null;
+    }
+}

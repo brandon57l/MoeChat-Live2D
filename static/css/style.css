@@ -1,0 +1,182 @@
+/* .chat-container {
+    position: fixed;
+    background-color: aliceblue;
+    
+    width: 100%;
+    max-width: 800px;
+    left: 50%;
+    transform: translateX(-50%); 
+    bottom: 0; 
+    top: 0;
+    opacity: 20%;
+
+    box-shadow: 0 1px 2px rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+    z-index: 1;
+} */
+ 
+.chat-container {
+  position: absolute;
+  width: 100%;
+  max-width: 520px;
+  height: 100%;
+  /* background:linear-gradient(to bottom, rgba(0, 0, 0, 0.604) -356%, rgba(88, 67, 110, 0.2) 717%); */
+  background-color: rgb(22, 22, 22);
+  color: #fff;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 1px 2px rgba(60,64,67,0.3), 0 1px 3px 1px rgba(60,64,67,0.15);
+}
+
+.shadow-box {
+  /* background: rgba(255, 255, 255, 0.1);  */
+  backdrop-filter: blur(2px); /* Flou plus subtil */
+  /* border-radius: 12px; /* Coins arrondis */
+  padding: 20px;
+  box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+  
+  border: 1px solid #2c2c2c69;
+}
+
+    /* Navbar minimaliste */
+    .navbar {
+        background: rgba(255, 255, 255, 0.2);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+        padding: 10px 20px;
+      }
+      .navbar-brand {
+        font-weight: 500;
+        color: #fff !important;
+      }
+      /* Zone de chat */
+      .chat-area {
+        flex: 1;
+        margin: auto;
+        overflow-y: auto;
+        padding: 20px;
+        max-width: 1000px;
+        width: 100%;
+      }
+      /* Styles des messages */
+      .message {
+        z-index: 1;
+        max-width: 90%;
+        margin-bottom: 10px;
+        padding: 9px 15px;
+        border-radius: 20px;
+        opacity: 0;
+        animation: fadeIn 0.4s forwards;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .message.sent {
+        background: rgba(255, 255, 255, 0.041);
+        align-self: flex-end;
+        
+      }
+      .message.received {
+        
+        align-self: flex-start;
+      }    
+
+      /* Supprime la marge par défaut des paragraphes dans .message */
+      .message div {
+        margin-bottom: 0 !important;
+        text-shadow: 2px 2px 5px rgba(0, 0, 0, 1);
+      }
+      /* Formulaire d'envoi */
+      .chat-input-wrapper {
+        position:relative;
+        padding: 12px 20px;
+        /* background-color: #58436e41; */
+        /* border-top: 1px solid rgba(255, 255, 255, 0.3); */
+        z-index: 1;
+      }
+      .input-container{
+        padding: 5px 7px 5px 15px;
+        width: 100%;
+        background: rgba(255, 255, 255, 0.041);
+        display: flex;
+        /* gap: 3px; */
+        align-items: center;
+        border-radius: 30px;
+      }
+      .chat-input {
+        width: 100%;
+        /* padding: 12px 50px 12px 15px; */
+        border: none;
+        border-radius: 30px;
+        outline: none;
+        background: rgba(255, 255, 255, 0);
+        color: #fff;
+      }
+      .chat-input::placeholder {
+        color: rgba(255, 255, 255, 0.7);
+      }
+      .send-btn {
+        background: none;
+        border: none;
+        outline: none;
+        color: #fff;
+        font-size: 1.5rem;
+        cursor: pointer;
+        margin-left: 8px;
+        opacity: 65%;
+      }
+      .send-btn:hover {
+        color: #ddd;
+      }
+
+
+
+          /* Style commun pour les boutons */
+    #photoIconContainer,
+    #sendIconContainer,
+    #toggleEmojiBtn {
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      /* border: 1px solid #55555573; */
+      border-radius: 30px;
+      transition: background-color 0.3s ease;
+      /* position: absolute; */
+
+
+    }
+
+    #photoIconContainer:hover,
+    #sendIconContainer:hover,
+    #toggleEmojiBtn:hover {
+      background-color: #5555553f;
+    }
+
+
+
+
+
+
+
+    .translations {
+      /* border-top: 1px solid #ffffff52; */
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+        display: none; /* Assure que l'élément ne prend pas de place quand caché */
+    }
+    
+    .translations.show {
+        display: block; /* Affiche l'élément avant l'animation */
+        max-height: 500px; /* Ajuste selon ton contenu */
+        opacity: 1;
+    }
+  
+  

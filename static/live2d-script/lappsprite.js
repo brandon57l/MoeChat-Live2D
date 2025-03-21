@@ -81,6 +81,7 @@ export class LAppSprite {
         gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, this._indexArray, gl.DYNAMIC_DRAW);
         gl.bindTexture(gl.TEXTURE_2D, this._texture);
         gl.drawElements(gl.TRIANGLES, this._indexArray.length, gl.UNSIGNED_SHORT, 0);
+        gl.clearColor(0.0, 0.0, 0.0, 0.0);
     }
     isHit(pointX, pointY) {
         const { height } = this._subdelegate.getCanvas();
@@ -97,3 +98,4 @@ export class LAppSprite {
 export class Rect {
 }
 //# sourceMappingURL=lappsprite.js.map
+

@@ -1,5 +1,6 @@
-import { LAppDelegate } from './assets/lappdelegate.js';
-import * as LAppDefine from './assets/lappdefine.js';
+import { LAppDelegate } from '../live2d-script/lappdelegate.js';
+import * as LAppDefine from '../live2d-script/lappdefine.js';
+import { LAppModel } from '../live2d-script/lappmodel.js';
 
 /**
  * ブラウザロード後の処理
@@ -13,6 +14,7 @@ window.addEventListener(
     }
 
     LAppDelegate.getInstance().run();
+
   },
   { passive: true }
 );

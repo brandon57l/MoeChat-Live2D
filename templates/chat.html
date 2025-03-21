@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+  <title>Live2D Cubism Example</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <style>
+    /* Styles de base */
+    html, body {
+      overflow: hidden;
+      margin: 0;
+    }
+    html {
+      overscroll-behavior-x: none;
+      touch-action: none;
+    }
+    body {
+      display: flex;
+      justify-content: center;
+      background-color: rgb(22, 22, 22);
+    }
+
+    body > canvas:only-child {
+      width: 100lvw; /* Large viewport width */
+      height: 100lvh;
+    }
+    canvas {
+      position: absolute;
+      max-width: 800px;
+      z-index: 0;
+    }
+    /* Style du SVG d'envoi (déjà existant) */
+    #svgSendIconBtn {
+      background-color: #ccc; /* Change la couleur si besoin */
+      -webkit-mask-image: url("{{ url_for('static', filename='icons/paper-plane-regular.svg') }}");
+      mask-image: url("{{ url_for('static', filename='icons/paper-plane-regular.svg') }}");
+      border: none;
+    
+    }
+  </style>
+</head>
+<body>
+  
+  <div class="chat-container">
+        
+    <!-- Barre de navigation -->
+    <!-- <nav class="navbar navbar-expand">
+      <a class="navbar-brand" href="#">Messagerie</a>
+    </nav> -->
+
+    <!-- Zone de chat -->
+    <div class="chat-area d-flex flex-column" id="chat-box">
+      {% for message in messages %}
+        <div class="d-flex flex-column {% if message.sender == current_user %}align-items-end{% else %}align-items-start{% endif %}">
+          <div class="message {% if message.sender == current_user %}sent{% else %}received{% endif %}">
+            <p class="mb-0">{{ message.text }}</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Formulaire d'envoi -->
+    <div class="chat-input-wrapper">
+      <form id="message-form" class="d-flex">
+          <div class="input-container">
+            <input type="text" name="message" id="message-input" class="chat-input" placeholder="Tapez votre message..." required>
+            <div id="sendIconContainer" class="no-close-keyboard" onclick="sendMessage(event); return false;">
+              <svg id="svgSendIconBtn" width="18" height="18"></svg>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+  <!-- Charge le script principal en tant que module -->
+  <script src="{{ url_for('static', filename='lib/live2dcubismcore.min.js') }}"></script>
+
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+
+  <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <!-- <script type="module" src="{{ url_for('static', filename='js/llmhandler.js') }}"></script>
+  <script type="module" src="{{ url_for('static', filename='js/llmhandler.js') }}"></script> -->
+  <script>
+
+  document.getElementById('message-input').addEventListener('focus', function(e) {
+    e.preventDefault();
+    e.target.focus({ preventScroll: true });
+  });
+  </script>
+</body>
+</html>
