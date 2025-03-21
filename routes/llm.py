@@ -10,7 +10,7 @@ GEMINI_API_KEY = os.environ.get("GEMINI_API_KEY", "AIzaSyBiZONd6VA8y9zAd8vueZRo_
 GEMINI_API_ENDPOINT = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key={GEMINI_API_KEY}"
 
 def init_front(app):
-    @app.route("/chat")
+    @app.route("/")
     def index():
         return render_template("chat.html", messages=[])
 
