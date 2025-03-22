@@ -1,30 +1,52 @@
 // ttshandler.js
 
-export function fetchTTS(text,model) {
+export function fetchTTS(text, model) {
     $.ajax({
-        url: "/synthesize",
+        url: "https://infections-une-somebody-heath.trycloudflare.com/synthesize", // Ton URL API de synthèse vocale
         type: "POST",
         contentType: "application/json",
-        data: JSON.stringify({ text: text ,voice: "zf_xiaobei" }),
+        data: JSON.stringify({ text: text, voice: "zf_xiaobei" }), // Ton texte à convertir en audio
         xhrFields: {
-            responseType: "blob",
+            responseType: "blob", // S'assurer que la réponse est de type blob
         },
         success: function (response) {
             if (!response || response.size === 0) {
                 console.error("Réponse vide de l'API TTS.");
                 return;
             }
-            const wavUrl = URL.createObjectURL(response);
             
+            // Crée un lien blob pour l'audio
+            const blobUrl = URL.createObjectURL(response);
+            console.log("Lien blob généré :", blobUrl);
             
+            // Sélectionne toujours le dernier élément avec la classe 'audioIconContainer'
+            const lastAudioIconContainer = $(".audioIconContainer").last();
+            
+            // Stocke le lien blob dans le dernier élément sélectionné
+            lastAudioIconContainer.data("audio-url", blobUrl);
+
+            // Vérifie si un modèle Live2D est chargé
             if (model) {
-                model.startLive2DSpeech(wavUrl);
+                model.startLive2DSpeech(blobUrl);
             } else {
-                console.error("Aucun modèle Live2D n'a été chargé !");
+                var audio = new Audio(blobUrl);
+                audio.play();
             }
+
+            // Gère l'événement de clic pour jouer l'audio
+            lastAudioIconContainer.off("click").on("click", function () {
+                var audioUrl = $(this).data("audio-url");
+                if (audioUrl) {
+
+                    model.startLive2DSpeech(audioUrl);
+                } else {
+                    console.error("Aucun audio n'est associé à cet élément.");
+                }
+            });
         },
         error: function (xhr, status, error) {
-            console.error("Erreur lors de la synthèse vocale:", error);
+            console.error("Erreur lors de la synthèse vocale :", error);
         }
     });
 }
+

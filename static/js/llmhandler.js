@@ -54,7 +54,7 @@ export async function fetchLLM() {
 
                     // Affichage du message avec animation améliorée
                     var receivedMessageHtml = `
-                        <div class="d-flex flex-column align-items-start">
+                        <div class="d-flex flex-row align-items-center">
                             <div class="message received" style="cursor: pointer;">
                                 <div class="mb-0">
                                     <div class="cn-text" style="display:block">${cnText}</div>
@@ -63,6 +63,11 @@ export async function fetchLLM() {
                                         <br>-->
                                         🇫🇷 : ${frText}
                                     </div>
+                                </div>
+                            </div>
+                            <div class="d-flex flex-column align-items-center;" style="z-index:1">
+                                <div class="no-close-keyboard audioIconContainer" onclick="">
+                                    <svg class="svgAudiIconBtn" width="13" height="13"></svg>
                                 </div>
                             </div>
                         </div>`;

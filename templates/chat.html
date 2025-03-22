@@ -40,10 +40,19 @@
       border: none;
     
     }
+
+    .svgAudiIconBtn{
+      background-color: #fff; /* Change la couleur si besoin */
+      -webkit-mask-image: url("{{ url_for('static', filename='icons/circle-play-regular.svg') }}");
+      mask-image: url("{{ url_for('static', filename='icons/circle-play-regular.svg') }}");
+      border: none;
+    }
   </style>
 </head>
 <body>
-  
+  <div id="loading">Chargement...</div>
+  <canvas id="live2dCanvas"></canvas>
+
   <div class="chat-container">
         
     <!-- Barre de navigation -->

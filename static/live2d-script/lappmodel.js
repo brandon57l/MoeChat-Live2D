@@ -354,7 +354,7 @@ export class LAppModel extends CubismUserModel {
 
         let rmsValue = 0.0;
         rmsValue = this._wavFileHandler.getRms();
-        console.log(`RMS value : ${rmsValue}`);
+        // console.log(`RMS value : ${rmsValue}`);
         if (this._lipsync) {
             let value = 0.0;
             this._wavFileHandler.update(deltaTimeSeconds);
