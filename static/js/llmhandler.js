@@ -114,10 +114,10 @@ export async function fetchLLM() {
 
 
                     // Met à jour l'historique avec la réponse de Gemini (JSON entière)
-                    conversationHistory.push({ text: "Haru : "+cnText, sender: "gemini" });  // Stocke le JSON
+                    conversationHistory.push({ text: "Haru : "+cnText+". Animation "+jsonResponse.anim, sender: "gemini" });  // Stocke le JSON
 
                     console.log("Réponse JSON de Gemini:", jsonResponse);
-                    return cnText;
+                    return jsonResponse;
                 }
                 else {
                     console.error("Réponse JSON incomplète. Clés 'cn', 'en', ou 'fr' manquantes.");

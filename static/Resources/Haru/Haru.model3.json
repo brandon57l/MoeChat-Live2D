@@ -55,32 +55,187 @@
 					"FadeInTime": 0.5,
 					"FadeOutTime": 0.5
 				}
+			],"TapBody": [
+
 			],
-			"TapBody": [
+			"All": [
 				{
-					"File": "motions/haru_g_m26.motion3.json",
+					"File": "motions/haru_g_m21.motion3.json",
 					"FadeInTime": 0.5,
 					"FadeOutTime": 0.5,
-					"Sound": "sounds/haru_talk_13.wav"
+					"Sound": "sounds/haru_talk_13.wav",
+					"info":"talk croise les bras et bouge de maniere douce"
+				},
+				{
+					"File": "motions/haru_g_m22.motion3.json",
+					"FadeInTime": 0.5,
+					"FadeOutTime": 0.5,
+					"Sound": "sounds/haru_talk_13.wav",
+					"info":"pas d'annimation"
 				},
 				{
 					"File": "motions/haru_g_m06.motion3.json",
 					"FadeInTime": 0.5,
 					"FadeOutTime": 0.5,
-					"Sound": "sounds/haru_Info_14.wav"
+					"Sound": "sounds/haru_Info_14.wav",
+					"info":"talk main en l'aire vers la gauche"
+				},
+				{
+					"File": "motions/haru_g_m06.motion3.json",
+					"FadeInTime": 0.5,
+					"FadeOutTime": 0.5,
+					"Sound": "sounds/haru_Info_14.wav",
+					"info":"talk main en l'aire vers la droit"
 				},
 				{
 					"File": "motions/haru_g_m20.motion3.json",
 					"FadeInTime": 0.5,
 					"FadeOutTime": 0.5,
-					"Sound": "sounds/haru_normal_6.wav"
+					"info":"talk reflexion"
 				},
 				{
 					"File": "motions/haru_g_m09.motion3.json",
 					"FadeInTime": 0.5,
 					"FadeOutTime": 0.5,
-					"Sound": "sounds/haru_Info_04.wav"
+					"info":"salutation tete pencher"
+				},
+				{
+					"File": "motions/haru_g_m01.motion3.json",
+					"FadeInTime": 0.5,
+					"FadeOutTime": 0.5,
+					"info":"affirmation de la tete"
+				},
+				{
+					"File": "motions/haru_g_m02.motion3.json",
+					"FadeInTime": 0.5,
+					"FadeOutTime": 0.5,
+					"info":"talk mai deriere le corp"
+				},
+				{
+					"File": "motions/haru_g_m03.motion3.json",
+					"FadeInTime": 0.5,
+					"FadeOutTime": 0.5,
+					"info":"talk ochement de la tete style decu ou triste"
+				},
+				{
+					"File": "motions/haru_g_m04.motion3.json",
+					"FadeInTime": 0.5,
+					"FadeOutTime": 0.5,
+					"info":"talk ochement de la tete style decu ou triste"
+				},
+				{
+					"File": "motions/haru_g_m05.motion3.json",
+					"FadeInTime": 0.5,
+					"FadeOutTime": 0.5,
+					"info":"talk surprise, ecart les bras le long du corp"
+				},
+				{
+					"File": "motions/haru_g_m08.motion3.json",
+					"FadeInTime": 0.5,
+					"FadeOutTime": 0.5,
+					"info":"ecarte les bras puis penche la tete en avant comme une salutation"
+				},
+				{
+					"File": "motions/haru_g_m09.motion3.json",
+					"FadeInTime": 0.5,
+					"FadeOutTime": 0.5,
+					"info":"penche la tete en avant doucement"
+				},
+				{
+					"File": "motions/haru_g_m10.motion3.json",
+					"FadeInTime": 0.5,
+					"FadeOutTime": 0.5,
+					"info":"eternument"
+				},
+				{
+					"File": "motions/haru_g_m11.motion3.json",
+					"FadeInTime": 0.5,
+					"FadeOutTime": 0.5,
+					"info":"choquer secous la tete de droit a gauche"
+				},
+				{
+					"File": "motions/haru_g_m12.motion3.json",
+					"FadeInTime": 0.5,
+					"FadeOutTime": 0.5,
+					"info":"leve les main en l'aire secous les bras et secous la tete de droit a gauche"
+				},
+				{
+					"File": "motions/haru_g_m13.motion3.json",
+					"FadeInTime": 0.5,
+					"FadeOutTime": 0.5,
+					"info":"suprise ecart les bras le long du corp et avance ca tete pour fixer du regard"
+				},
+				{
+					"File": "motions/haru_g_m14.motion3.json",
+					"FadeInTime": 0.5,
+					"FadeOutTime": 0.5,
+					"info":"leve les main en l'aire secous les bras et secous la tete de droit a gauche"
+				},
+				{
+					"File": "motions/haru_g_m15.motion3.json",
+					"FadeInTime": 0.5,
+					"FadeOutTime": 0.5,
+					"info":"talk croise les bras et bouge de maniere douce"
+				},
+				{
+					"File": "motions/haru_g_m16.motion3.json",
+					"FadeInTime": 0.5,
+					"FadeOutTime": 0.5,
+					"info":"approche les main de son visage soupire et et ferme les yeux"
+				},
+				{
+					"File": "motions/haru_g_m17.motion3.json",
+					"FadeInTime": 0.5,
+					"FadeOutTime": 0.5,
+					"info":"bras le long du corps, les main deriere le corp et rougis long"
+				},
+				{
+					"File": "motions/haru_g_m18.motion3.json",
+					"FadeInTime": 0.5,
+					"FadeOutTime": 0.5,
+					"info":"bras le long du corps, les main deriere le corp et rougis rapidement"
+				},
+				{
+					"File": "motions/haru_g_m19.motion3.json",
+					"FadeInTime": 0.5,
+					"FadeOutTime": 0.5,
+					"info":"ferme les yeux rougis et baise la tete style timide"
+				},				{
+					"File": "motions/haru_g_m26.motion3.json",
+					"FadeInTime": 0.5,
+					"FadeOutTime": 0.5,
+					"Sound": "sounds/haru_talk_13.wav",
+					"info":"pas d'annimation"
+				},
+				{
+					"File": "motions/haru_g_m25.motion3.json",
+					"FadeInTime": 0.5,
+					"FadeOutTime": 0.5,
+					"Sound": "sounds/haru_talk_13.wav",
+					"info":"pas d'annimation"
+				},
+				{
+					"File": "motions/haru_g_m24.motion3.json",
+					"FadeInTime": 0.5,
+					"FadeOutTime": 0.5,
+					"Sound": "sounds/haru_talk_13.wav",
+					"info":"pas d'annimation"
+				},
+				{
+					"File": "motions/haru_g_m23.motion3.json",
+					"FadeInTime": 0.5,
+					"FadeOutTime": 0.5,
+					"Sound": "sounds/haru_talk_13.wav",
+					"info":"pas d'annimation"
+				},
+				{
+					"File": "motions/haru_g_m26.motion3.json",
+					"FadeInTime": 0.5,
+					"FadeOutTime": 0.5,
+					"Sound": "sounds/haru_talk_13.wav",
+					"info":"suprise"
 				}
+				
 			]
 		},
 		"UserData": "Haru.userdata3.json"

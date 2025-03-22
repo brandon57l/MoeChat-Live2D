@@ -39,12 +39,63 @@ def init_gemini(app):
         *   'cn':  La réponse en caractères chinois.
         *   'en':  La traduction en anglais.
         *   'fr':  La traduction en français.
+        *   'anim': L'index de l'animation que dois faire l'avatar.
 
         Exemple:
 
-        json```{"cn": "你好！","en": "Hello!","fr": "Bonjour !"}```
+        json```{"cn": "你好！","en": "Hello!","fr": "Bonjour !","anim":}```
 
         Dans "cn" tu peux mettre des emojies pour representer tes pensées.
+
+        Voici la liste des animations 'anim' disponibles (index basé sur l'ordre de la liste d'animations) :
+        
+        0: Croise les bras et bouge doucement
+
+        1: Ferme les yeux, rougis et baisse la tête, style timide
+
+        2: Main en l'air vers la gauche
+
+        3: Main en l'air vers la droite
+
+        4: Réflexion
+
+        5: Salutation, tête penchée
+
+        6: Affirmation de la tête
+
+        7: Main derrière le dos
+
+        8: Secousse de la tête, style déçu ou triste
+
+        9: Secousse de la tête, style déçu ou triste
+
+        10: Surprise, écart des bras le long du corps
+
+        11: Écarte les bras puis penche la tête en avant comme une salutation
+
+        12: Penche la tête en avant doucement
+
+        13: Éternuement
+
+        14: Secoue la tête de droite à gauche, choqué
+
+        15: Lève les mains en l'air, secoue les bras et la tête de droite à gauche
+
+        16: Surprise, écarte les bras le long du corps et avance la tête pour fixer du regard
+
+        17: Lève les mains en l'air, secoue les bras et la tête de droite à gauche
+
+        18: Croise les bras et bouge doucement
+
+        19: Approche les mains de son visage, soupire et ferme les yeux
+
+        20: Bras le long du corps, mains derrière le dos, rougis longuement
+
+        21: Bras le long du corps, mains derrière le dos, rougis rapidement
+
+        22: Ferme les yeux, rougis et baisse la tête, style timide
+
+        Trés Important ! Varie les animations choisies, fais en sort de bien representer se qui est dis et essaie de ne pas toujours sélectionner les mêmes.
         '''
 
         data = {

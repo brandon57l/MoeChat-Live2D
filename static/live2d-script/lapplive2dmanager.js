@@ -34,27 +34,27 @@ export class LAppLive2DManager {
         }
     }
     onTap(x, y) {
-        if (LAppDefine.DebugLogEnable) {
-            LAppPal.printMessage(`[APP]tap point: {x: ${x.toFixed(2)} y: ${y.toFixed(2)}}`);
-        }
-        const model = this.getModel();
-        if (model.hitTest(LAppDefine.HitAreaNameHead, x, y)) {
-            if (LAppDefine.DebugLogEnable) {
-                LAppPal.printMessage(`[APP]hit area: [${LAppDefine.HitAreaNameHead}]`);
-            }
-            model.setRandomExpression();
-        }
-        else if (model.hitTest(LAppDefine.HitAreaNameBody, x, y)) {
-            if (LAppDefine.DebugLogEnable) {
-                LAppPal.printMessage(`[APP]hit area: [${LAppDefine.HitAreaNameBody}]`);
-            }
-            model.startRandomMotion(
-                LAppDefine.MotionGroupTapBody,
-                LAppDefine.PriorityNormal,
-                this.finishedMotion,
-                this.beganMotion
-            );
-        }
+        // if (LAppDefine.DebugLogEnable) {
+        //     LAppPal.printMessage(`[APP]tap point: {x: ${x.toFixed(2)} y: ${y.toFixed(2)}}`);
+        // }
+        // const model = this.getModel();
+        // if (model.hitTest(LAppDefine.HitAreaNameHead, x, y)) {
+        //     if (LAppDefine.DebugLogEnable) {
+        //         LAppPal.printMessage(`[APP]hit area: [${LAppDefine.HitAreaNameHead}]`);
+        //     }
+        //     model.setRandomExpression();
+        // }
+        // else if (model.hitTest(LAppDefine.HitAreaNameBody, x, y)) {
+        //     if (LAppDefine.DebugLogEnable) {
+        //         LAppPal.printMessage(`[APP]hit area: [${LAppDefine.HitAreaNameBody}]`);
+        //     }
+        //     model.startRandomMotion(
+        //         LAppDefine.MotionGroupTapBody,
+        //         LAppDefine.PriorityNormal,
+        //         this.finishedMotion,
+        //         this.beganMotion
+        //     );
+        // }
     }
     onUpdate() {
         const { width, height } = this._subdelegate.getCanvas();
@@ -128,11 +128,11 @@ export class LAppLive2DManager {
     
         $("#message-form").submit(async (event) => {
             event.preventDefault(); // Empêche la soumission classique du formulaire
-    
+            
             try {
                 const llmResponse = await fetchLLM();
                 
-                if (!llmResponse || typeof llmResponse !== "string") {
+                if (!llmResponse || typeof llmResponse !== "object") {
                     console.error("fetchLLM() n'a pas renvoyé un texte valide.");
                     return;
                 }
@@ -143,9 +143,11 @@ export class LAppLive2DManager {
                     console.error("Aucun modèle Live2D n'a été chargé !");
                     return;
                 }
-    
+                
                 // Appel de la synthèse vocale
-                fetchTTS(llmResponse,model);
+                const audioURL = await fetchTTS(llmResponse.cn, model);
+                
+                model.startLive2DSpeech(audioURL,llmResponse.anim)
                 
             } catch (error) {
                 console.error("Erreur lors de l'appel à fetchLLM() :", error);

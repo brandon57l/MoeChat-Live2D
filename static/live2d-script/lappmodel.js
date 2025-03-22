@@ -52,12 +52,33 @@ var LoadStep;
     LoadStep[LoadStep["CompleteSetup"] = 22] = "CompleteSetup";
 })(LoadStep || (LoadStep = {}));
 export class LAppModel extends CubismUserModel {
-    startLive2DSpeech(wavUrl) {
+    startLive2DSpeech(wavUrl,animIndex) {
         this._wavFileHandler.start(wavUrl);
         const audio = new Audio(wavUrl);
+        this.playMotion(animIndex)
         audio.play().catch((err) => {
             console.error('Erreur lors de la lecture audio:', err);
         });
+        
+    }
+
+    // Fonction pour jouer une animation spécifique
+    playMotion(index) {
+        // Vérifie si l'index est valide
+        if (index >= 0 && index < this._modelSetting.getMotionCount(LAppDefine.MotionGroupAll)) {
+
+            // Charge et joue l'animation avec le son et les effets de fondu
+            this.startMotion(
+                LAppDefine.MotionGroupAll,           // Fichier de l'animation
+                index,                     // Index de la motion
+                LAppDefine.PriorityNormal, 
+                this.finishedMotion,   // Fonction appelée quand l'animation est terminée
+                this.beganMotion       // Fonction appelée quand l'animation commence
+            );
+            
+        } else {
+            console.log("Index de l'animation invalide.");
+        }
     }
 
     loadAssets(dir, fileName) {
