@@ -1,6 +1,8 @@
 import os
 import json
-from flask import Flask, render_template, request, jsonify, send_from_directory
+from flask import Flask, render_template, request, jsonify, send_from_directory,flash
+from flask_login import login_required, current_user
+from extensions.database import db
 import requests
 
 
@@ -14,21 +16,28 @@ def init_front(app):
     def index():
         return render_template("chat.html", messages=[])
 
-
 def init_gemini(app):
-    
+    @login_required
     @app.route('/send_message', methods=['POST'])
     def send_message():
+        # Vérifier que l'utilisateur a au moins 500 tokens
+        if current_user.tokens < 500:
+            print(f"Vous avez plus assez de tokens pour envoyer un message.")
+            response_text = {"parts": [{"text": "Votre solde de tokens est insuffisant pour envoyer ce message. Veuillez recharger votre compte ou contacter le support pour plus d’informations."}]}
+            return jsonify({
+                    'gemini_response': response_text,
+                    'history': current_user.get_history(),
+                    'tokens': current_user.tokens
+                })
+
         # Récupérer le message et l'historique envoyé par le client
         message = request.form.get('message')
         history = request.form.get('history')
-        
-        # Convertir l'historique en liste d'objets (s'il existe)
         conversation_history = json.loads(history) if history else []
-        
-        # Préparer la requête à l'API Gemini en envoyant tout l'historique
+
         headers = {'Content-Type': 'application/json'}
 
+        # Préparer le contexte et la requête à l'API Gemini
         context = '''
         Tu es Haru, une femme native chinoise. Tu as une conversation en chinois avec quelqu'un et tu lui réponds en utilisant des caractères chinois. Priorité absolue aux caractères chinois dans tes réponses. Tu aides à apprendre le chinois en discutant normalement. Réponds de manière naturelle et conversationnelle. Phrases courtes et encourageantes.
 
@@ -43,9 +52,9 @@ def init_gemini(app):
 
         Exemple:
 
-        json```{"cn": "你好！","en": "Hello!","fr": "Bonjour !","anim":}```
+        json```{"cn": "你好！","en": "Hello!","fr": "Bonjour !","anim": 6}```
 
-        Dans "cn" tu peux mettre des emojies pour representer tes pensées.
+        Dans "cn" tu peux mettre des emojis pour représenter tes pensées.
 
         Voici la liste des animations 'anim' disponibles (index basé sur l'ordre de la liste d'animations) :
         
@@ -95,54 +104,65 @@ def init_gemini(app):
 
         22: Ferme les yeux, rougis et baisse la tête, style timide
 
-        Trés Important ! Varie les animations choisies, fais en sort de bien representer se qui est dis et essaie de ne pas toujours sélectionner les mêmes.
+        Trés Important ! Varie les animations choisies, fais en sorte de bien représenter ce qui est dit et essaie de ne pas toujours sélectionner les mêmes.
         '''
 
         data = {
             "contents": [
                 {
                     "role": "model",
-                    "parts": [{"text": context}] 
+                    "parts": [{"text": context}]
                 },
                 {
-                    "role": "user",  # Message de l'utilisateur
-                    "parts": [{"text": msg['text']} for msg in conversation_history] 
+                    "role": "user",
+                    "parts": [{"text": msg['text']} for msg in conversation_history]
                 }
             ]
         }
-        
+
         try:
             response = requests.post(GEMINI_API_ENDPOINT, json=data, headers=headers)
             gemini_response = response.json()
-            
-            print(gemini_response)  # Debug pour voir la vraie structure
+            print(gemini_response)  # Debug
 
+            # Traitement de la réponse pour extraire le texte
             if isinstance(gemini_response, dict) and "candidates" in gemini_response:
                 candidates = gemini_response["candidates"]
-                
                 if isinstance(candidates, list) and len(candidates) > 0:
                     content = candidates[0].get("content")
-                    
-                    # Vérifie si content est une simple string ou un objet
                     if isinstance(content, dict) and "parts" in content:
                         text_value = content["parts"][0].get("text", "Réponse vide.")
                     elif isinstance(content, str):
                         text_value = content
                     else:
                         text_value = "Réponse inattendue."
-
                     response_text = {"parts": [{"text": text_value}]}
                 else:
                     response_text = {"parts": [{"text": "Aucune réponse valide reçue de l'IA."}]}
             else:
                 response_text = {"parts": [{"text": "Réponse inattendue du serveur."}]}
-
         except Exception as e:
-            print(f"Erreur : {e}")  # Debug pour voir l'erreur
-            response_text = {"parts": [{"text": "Nous rencontrons actuellement un problème technique. Veuillez réessayer plus tard. Merci pour votre patience !"}]}
+            print(f"Erreur : {e}")
+            response_text = {"parts": [{"text": "Nous rencontrons actuellement un problème technique. Veuillez réessayer plus tard."}]}
 
-        # Retourner la réponse et l'historique
-        return jsonify({'gemini_response': response_text, 'history': conversation_history})
+        # Mise à jour de l'historique de conversation
+        # On ajoute le message de l'utilisateur et la réponse de l'IA
+        current_user.add_to_history({"role": "user", "text": message})
+        current_user.add_to_history({"role": "assistant", "text": response_text["parts"][0]["text"]})
+
+        # Supposons que l'API indique le nombre de tokens utilisés dans la réponse
+        tokens_used = gemini_response.get("usageMetadata", {}).get("totalTokenCount", 0)
+        current_user.tokens -= tokens_used
+
+        # Optionnel : afficher le nouveau nombre de tokens dans la réponse
+        db.session.commit()
+
+        return jsonify({
+            'gemini_response': response_text,
+            'history': current_user.get_history(),
+            'tokens': current_user.tokens
+        })
+
 
     # Retourner des images demander par l'AI
     @app.route('/IMG/<path:filename>')

@@ -15,7 +15,6 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='css/poppins.css') }}">
 
   <style>
-    
     /* Styles de base */
     html, body {
       font-family: "Poppins", sans-serif;
@@ -31,9 +30,8 @@
       justify-content: center;
       background-color: #F4EAD5 !important;
     }
-
     body > canvas:only-child {
-      width: 100lvw; /* Large viewport width */
+      width: 100lvw;
       height: 100lvh;
     }
     canvas {
@@ -41,28 +39,23 @@
       top: 15px;
       max-width: 800px;
       height: calc(95vh - 72px - 60px);
-      z-index: 0; /* Le canvas est en dessous */
+      z-index: 0;
       background-color: #F4EAD5;
       transition: top 0.5s ease-out, height 0.5s ease-out;
     }
-
-    /* Quand le clavier est ouvert, on réduit la hauteur et on déplace le canvas */
     canvas.keyboard-open {
-      top: 0; /* Par exemple, on le positionne en haut */
-      height: 600px !important; /* Ajuste la valeur en fonction de la hauteur du clavier */
+      top: 0;
+      height: 600px !important;
     }
-
-    /* Style du SVG d'envoi (déjà existant) */
+    /* Bouton SVG pour l'envoi déjà existant */
     #svgSendIconBtn {
-      background-color: #7E6363; /* Change la couleur si besoin */
+      background-color: #7E6363;
       -webkit-mask-image: url("{{ url_for('static', filename='icons/paper-plane-regular.svg') }}");
       mask-image: url("{{ url_for('static', filename='icons/paper-plane-regular.svg') }}");
       border: none;
-    
     }
-
     .svgAudiIconBtn{
-      background-color: #7E6363; /* Change la couleur si besoin */
+      background-color: #7E6363;
       -webkit-mask-image: url("{{ url_for('static', filename='icons/circle-play-regular.svg') }}");
       mask-image: url("{{ url_for('static', filename='icons/circle-play-regular.svg') }}");
       border: none;
@@ -73,6 +66,7 @@
 <body>
   <div id="loading">Chargement...</div>
 
+  <!-- Barre de navigation -->
   <ul class="nav nav-underline poppins-extrabold">
     <li class="nav-item active">
       <a class="nav-link active" aria-current="page" href="#">Home</a>
@@ -83,15 +77,25 @@
     <li class="nav-item">
       <a class="nav-link" href="#">Profil</a>
     </li>
+    <!-- Élément ajouté à droite -->
+    <li class="nav-item ml-auto">
+      {% if current_user.is_authenticated %}
+        <a class="nav-link" href="">
+          <!-- Exemple d'émoticône SVG -->
+          <svg class="emoticon-svg" width="24" height="24" fill="#C6698B" viewBox="0 0 24 24">
+            <circle cx="12" cy="12" r="10" stroke="none" />
+            <circle cx="9" cy="10" r="1.5" fill="#fff" />
+            <circle cx="15" cy="10" r="1.5" fill="#fff" />
+            <path d="M8 15c1.333 1 2.667 1 4 0" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/>
+          </svg>
+        </a>
+      {% else %}
+        <a class="nav-link poppins-semibold" href="{{ url_for('login') }}" style="color: #C6698B; font-size: 13px;">Se connecter</a>
+      {% endif %}
+    </li>
   </ul>
-  <div class="chat-container">
-    
-        
-    <!-- Barre de navigation -->
-    <!-- <nav class="navbar navbar-expand">
-      <a class="navbar-brand" href="#">Messagerie</a>
-    </nav> -->
 
+  <div class="chat-container">
     <!-- Zone de chat -->
     <div class="chat-area d-flex flex-column" id="chat-box">
       <div class="chat-gradient"></div>
@@ -103,7 +107,7 @@
             </div>
           </div>
         {% endfor %}
-    </div>
+      </div>
     </div>
 
     <!-- Formulaire d'envoi -->
@@ -113,44 +117,32 @@
             <input type="text" name="message" id="message-input" class="chat-input poppins-medium" placeholder="Tapez votre message..." required>
             <div id="sendIconContainer" class="no-close-keyboard" onclick="sendMessage(event); return false;">
               <svg id="svgSendIconBtn" width="18" height="18"></svg>
+            </div>
           </div>
-        </div>
       </form>
     </div>
   </div>
-  <!-- Charge le script principal en tant que module -->
-  <script src="{{ url_for('static', filename='lib/live2dcubismcore.min.js') }}"></script>
 
+  <script src="{{ url_for('static', filename='lib/live2dcubismcore.min.js') }}"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-
   <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
-  <!-- <script type="module" src="{{ url_for('static', filename='js/llmhandler.js') }}"></script>
-  <script type="module" src="{{ url_for('static', filename='js/llmhandler.js') }}"></script> -->
-
 
   <script>
+    document.getElementById('message-input').addEventListener('focus', function(e) {
+      e.preventDefault();
+      e.target.focus({ preventScroll: true });
+    });
 
-  document.getElementById('message-input').addEventListener('focus', function(e) {
-    e.preventDefault();
-    e.target.focus({ preventScroll: true });
-  });
-
-
-  // On stocke la hauteur initiale de la fenêtre au chargement.
-  let initialHeight = window.innerHeight;
-
-  window.addEventListener('resize', () => {
-    // Si la nouvelle hauteur est inférieure d'au moins 100px par rapport à l'initiale, on considère que le clavier est ouvert.
-    if (window.innerHeight < initialHeight - 100) {
-      document.querySelector('canvas').classList.add('keyboard-open');
-    } else {
-      document.querySelector('canvas').classList.remove('keyboard-open');
-      // Mettre à jour initialHeight si besoin (par exemple lors de la rotation d'écran)
-      initialHeight = window.innerHeight;
-    }
-  });
-
+    let initialHeight = window.innerHeight;
+    window.addEventListener('resize', () => {
+      if (window.innerHeight < initialHeight - 100) {
+        document.querySelector('canvas').classList.add('keyboard-open');
+      } else {
+        document.querySelector('canvas').classList.remove('keyboard-open');
+        initialHeight = window.innerHeight;
+      }
+    });
   </script>
 </body>
 </html>

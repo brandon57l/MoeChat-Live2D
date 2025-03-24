@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Inscription</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"> <!-- Viewport corrigé -->
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/poppins.css') }}">
+  
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background-color: #FFFBE9;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh; /* Correction ici */
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 400px;
+            width: 100%; /* Pour bien remplir l'espace */
+            background-color: #F4EAD5 ;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: rgba(0, 0, 0, 0.05) 0px 0px 0px 1px;
+        }
+
+        .title {
+            text-align: center;
+            margin-bottom: 15px;
+            color: #7E6363;
+            background-color: #CCD6A6;
+            padding: 30px;
+        }
+
+
+        input[type="email"], input[type="text"], input[type="password"] {
+            width: 100%;
+            padding: 10px 15px;
+            border-radius: 20px;
+            margin: 5px 0 15px;
+            border: none;
+            background-color: #edede9;
+            border: 1px solid #7e636327;
+            box-shadow: rgba(0, 0, 0, 0.1) 0px 1px 3px 0px, rgba(0, 0, 0, 0.06) 0px 1px 2px 0px;
+        }
+
+        button {
+            width: 100%;
+            padding: 10px;
+            background-color: #C4698A;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        button:hover {
+            background-color: #df85a6;
+        }
+
+        .shadow-box {
+            /* background: rgba(255, 255, 255, 0.1);  */
+            backdrop-filter: blur(2px); /* Flou plus subtil */
+            /* border-radius: 12px; /* Coins arrondis */
+            padding: 20px;
+            box-shadow: 0px 4px 15px rgba(0, 0, 0, 0.2);
+            
+            border: 1px solid #2c2c2c2d;
+        }
+
+        .message{
+            color: #7E6363;
+            text-align: justify;
+            font-size: 14px;
+        }
+
+        /* Média pour les appareils mobiles */
+        @media (max-width: 480px) {
+            .container {
+                padding: 20px;
+                border-radius: 15px;
+                width: 100%;
+            }
+
+            h1 {
+                font-size: 30px;
+            }
+
+            button {
+                padding: 8px;
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1 class="title poppins-black">INSCRIPTION</h1>
+        <form method="POST">
+            <input type="email" name="email" placeholder="Email..." required>
+            <input type="text" name="pseudo" placeholder="Choisisez un pseudo..." required>
+            <input type="password" name="password" placeholder="Mot de passe..." required>
+            <button type="submit">S'inscrire</button>
+            <div class="message mt-3">
+                En soumettant ce formulaire, vous acceptez nos 
+                <a href="/conditions" style="color: #C4698A; text-decoration: none;">Conditions d'utilisation</a> 
+                et notre 
+                <a href="/confidentialite" style="color: #C4698A; text-decoration: none;">Politique de confidentialité</a>.
+            </div>
+            <div class="message mt-2">
+                Vous possédez deja un compte ? 
+                <a href="/login" style="color: #C4698A; text-decoration: none; font-weight: 600;">Connectez-vous ici</a>.
+            </div>
+            
+        </form>
+    </div>
+</body>
+</html>
