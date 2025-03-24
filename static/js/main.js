@@ -8,13 +8,8 @@ window.addEventListener(
     // Créer et afficher le loader
     const loader = document.querySelector("#loading");
 
-    // Assigner un ID au canvas généré automatiquement
+
     const canvas = document.querySelector('canvas');
-    if (canvas) {
-      canvas.id = 'live2dCanvas';
-    } else {
-      console.error("Aucun canvas trouvé !");
-    }
 
     // Initialiser l'application Live2D
     if (!LAppDelegate.getInstance().initialize()) {

@@ -5,12 +5,20 @@
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
   <title>Live2D Cubism Example</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
-  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+  
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/poppins.css') }}">
+
   <style>
     
     /* Styles de base */
     html, body {
+      font-family: "Poppins", sans-serif;
       overflow: hidden;
       margin: 0;
     }
@@ -21,7 +29,7 @@
     body {
       display: flex;
       justify-content: center;
-      background-color: rgb(22, 22, 22);
+      background-color: #F4EAD5 !important;
     }
 
     body > canvas:only-child {
@@ -30,12 +38,23 @@
     }
     canvas {
       position: absolute;
+      top: 15px;
       max-width: 800px;
-      z-index: 0;
+      height: calc(95vh - 72px - 60px);
+      z-index: 0; /* Le canvas est en dessous */
+      background-color: #F4EAD5;
+      transition: top 0.5s ease-out, height 0.5s ease-out;
     }
+
+    /* Quand le clavier est ouvert, on réduit la hauteur et on déplace le canvas */
+    canvas.keyboard-open {
+      top: 0; /* Par exemple, on le positionne en haut */
+      height: 600px !important; /* Ajuste la valeur en fonction de la hauteur du clavier */
+    }
+
     /* Style du SVG d'envoi (déjà existant) */
     #svgSendIconBtn {
-      background-color: #ccc; /* Change la couleur si besoin */
+      background-color: #7E6363; /* Change la couleur si besoin */
       -webkit-mask-image: url("{{ url_for('static', filename='icons/paper-plane-regular.svg') }}");
       mask-image: url("{{ url_for('static', filename='icons/paper-plane-regular.svg') }}");
       border: none;
@@ -43,18 +62,30 @@
     }
 
     .svgAudiIconBtn{
-      background-color: #fff; /* Change la couleur si besoin */
+      background-color: #7E6363; /* Change la couleur si besoin */
       -webkit-mask-image: url("{{ url_for('static', filename='icons/circle-play-regular.svg') }}");
       mask-image: url("{{ url_for('static', filename='icons/circle-play-regular.svg') }}");
       border: none;
     }
   </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
   <div id="loading">Chargement...</div>
-  <canvas id="live2dCanvas"></canvas>
 
+  <ul class="nav nav-underline poppins-extrabold">
+    <li class="nav-item active">
+      <a class="nav-link active" aria-current="page" href="#">Home</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#">Chat</a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link" href="#">Profil</a>
+    </li>
+  </ul>
   <div class="chat-container">
+    
         
     <!-- Barre de navigation -->
     <!-- <nav class="navbar navbar-expand">
@@ -63,20 +94,23 @@
 
     <!-- Zone de chat -->
     <div class="chat-area d-flex flex-column" id="chat-box">
-      {% for message in messages %}
-        <div class="d-flex flex-column {% if message.sender == current_user %}align-items-end{% else %}align-items-start{% endif %}">
-          <div class="message {% if message.sender == current_user %}sent{% else %}received{% endif %}">
-            <p class="mb-0">{{ message.text }}</p>
+      <div class="chat-gradient"></div>
+      <div class="message-container">
+        {% for message in messages %}
+          <div class="d-flex flex-column {% if message.sender == current_user %}align-items-end{% else %}align-items-start{% endif %}">
+            <div class="message {% if message.sender == current_user %}sent{% else %}received{% endif %}">
+              <p class="mb-0">{{ message.text }}</p>
+            </div>
           </div>
-        </div>
-      {% endfor %}
+        {% endfor %}
+    </div>
     </div>
 
     <!-- Formulaire d'envoi -->
     <div class="chat-input-wrapper">
       <form id="message-form" class="d-flex">
           <div class="input-container">
-            <input type="text" name="message" id="message-input" class="chat-input" placeholder="Tapez votre message..." required>
+            <input type="text" name="message" id="message-input" class="chat-input poppins-medium" placeholder="Tapez votre message..." required>
             <div id="sendIconContainer" class="no-close-keyboard" onclick="sendMessage(event); return false;">
               <svg id="svgSendIconBtn" width="18" height="18"></svg>
           </div>
@@ -93,12 +127,30 @@
   <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
   <!-- <script type="module" src="{{ url_for('static', filename='js/llmhandler.js') }}"></script>
   <script type="module" src="{{ url_for('static', filename='js/llmhandler.js') }}"></script> -->
+
+
   <script>
 
   document.getElementById('message-input').addEventListener('focus', function(e) {
     e.preventDefault();
     e.target.focus({ preventScroll: true });
   });
+
+
+  // On stocke la hauteur initiale de la fenêtre au chargement.
+  let initialHeight = window.innerHeight;
+
+  window.addEventListener('resize', () => {
+    // Si la nouvelle hauteur est inférieure d'au moins 100px par rapport à l'initiale, on considère que le clavier est ouvert.
+    if (window.innerHeight < initialHeight - 100) {
+      document.querySelector('canvas').classList.add('keyboard-open');
+    } else {
+      document.querySelector('canvas').classList.remove('keyboard-open');
+      // Mettre à jour initialHeight si besoin (par exemple lors de la rotation d'écran)
+      initialHeight = window.innerHeight;
+    }
+  });
+
   </script>
 </body>
 </html>
