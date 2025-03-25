@@ -60,6 +60,19 @@
       mask-image: url("{{ url_for('static', filename='icons/circle-play-regular.svg') }}");
       border: none;
     }
+    .tokens-container{
+      display: flex;
+      align-items: center;
+      text-align: center;
+      gap: 3px;
+      color: #7E6363 !important;
+    }
+    .token-icon{
+      width: 20px;
+      height: 20px;
+      background-image: url("{{ url_for('static', filename='icons/piece-de-monnaie.png') }}");
+      background-size: cover;
+    }
   </style>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
@@ -80,14 +93,10 @@
     <!-- Élément ajouté à droite -->
     <li class="nav-item ml-auto">
       {% if current_user.is_authenticated %}
-        <a class="nav-link" href="">
-          <!-- Exemple d'émoticône SVG -->
-          <svg class="emoticon-svg" width="24" height="24" fill="#C6698B" viewBox="0 0 24 24">
-            <circle cx="12" cy="12" r="10" stroke="none" />
-            <circle cx="9" cy="10" r="1.5" fill="#fff" />
-            <circle cx="15" cy="10" r="1.5" fill="#fff" />
-            <path d="M8 15c1.333 1 2.667 1 4 0" stroke="#fff" stroke-width="1.5" fill="none" stroke-linecap="round"/>
-          </svg>
+        <a class="nav-link tokens-container" href="">
+          {{ "{:.0f}".format(current_user.tokens / 1000) }}
+
+          <div class="token-icon"></div>
         </a>
       {% else %}
         <a class="nav-link poppins-semibold" href="{{ url_for('login') }}" style="color: #C6698B; font-size: 13px;">Se connecter</a>

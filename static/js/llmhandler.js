@@ -151,6 +151,10 @@ export async function fetchLLM() {
                     conversationHistory.push({ text: "Haru : "+cnText+". Animation "+jsonResponse.anim, sender: "gemini" });  // Stocke le JSON
 
                     console.log("Réponse JSON de Gemini:", jsonResponse);
+
+                    data.tokens = Math.round(data.tokens / 1000);
+                    $(".tokens-container").contents().first().replaceWith(data.tokens);
+
                     return jsonResponse;
                 }
                 else {
