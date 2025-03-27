@@ -1,3 +1,7 @@
+import { showNotification } from '../js/notificationhandler.js';
+                
+
+
 // Variable globale pour stocker l'historique de la conversation
 var conversationHistory = [];
 
@@ -35,10 +39,21 @@ export async function fetchLLM() {
             data: { message: messageText, history: historyToSend },
         });
 
+        if(data.warning){
+            showNotification("Warning",data.warning,10000, "warning")
+            return;
+        }
+        
+        if(data.error){
+            showNotification("Error",data.error,10000, "error")
+            return;
+        }
+        
         if (data.gemini_response) {
             var geminiResponseText = data.gemini_response.parts[0].text;
 
 
+            
             // Enlève les balises ```json et ``` si elles sont présentes
             geminiResponseText = geminiResponseText.replace("```json", "").replace("```", "").trim();
 
@@ -169,6 +184,9 @@ export async function fetchLLM() {
                     $("#chat-box").append(receivedMessageHtml);
                     $("#chat-box").animate({ scrollTop: $("#chat-box")[0].scrollHeight }, 500);
                     conversationHistory.push({ text: "Réponse JSON incomplète du chatbot.", sender: "gemini" });
+
+                    showNotification("Warning","Réponse incomplète du chatbot.",5000, "warning")
+
                     return null;
                 }
 
@@ -185,11 +203,14 @@ export async function fetchLLM() {
                 $("#chat-box").append(receivedMessageHtml);
                 $("#chat-box").animate({ scrollTop: $("#chat-box")[0].scrollHeight }, 500);
                 conversationHistory.push({ text: "Erreur lors de l'analyse de la réponse JSON. Réponse brute:" + geminiResponseText, sender: "gemini" }); // Stocke la reponse brute
+                
+                showNotification("Warning","Réponse incomplète du chatbot.",5, "warning")
                 return null;
             }
         }
     } catch (error) {
         console.log("Une erreur est survenue lors de l'envoi du message.", error);
+        showNotification("Error","Une erreur est survenue lors de l'envoi du message.",5000, "error")
         return null;
     }
 }

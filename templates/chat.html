@@ -60,6 +60,64 @@
       mask-image: url("{{ url_for('static', filename='icons/circle-play-regular.svg') }}");
       border: none;
     }
+    .notif-icon {
+    width: 13px;
+    height: 13px;
+    margin: 10px;
+    background-color: white;
+    -webkit-mask-image: url("{{ url_for('static', filename='icons/bell-solid.svg') }}");
+    mask-image: url("{{ url_for('static', filename='icons/bell-solid.svg') }}");
+    
+    /* Assurez-vous que le masque couvre bien toute la zone */
+    -webkit-mask-size: cover;
+    mask-size: cover;
+    
+    /* Pour s'assurer que le masque est bien centré */
+    -webkit-mask-position: center;
+    mask-position: center;
+    
+    /* Permet d'éviter que l'image soit répétée */
+    -webkit-mask-repeat: no-repeat;
+    mask-repeat: no-repeat;
+    
+    border: none;
+}
+
+.notif-icon {
+  width: 13px;
+  height: 13px;
+  margin: 10px;
+  background-color: white;
+  -webkit-mask-image: url("{{ url_for('static', filename='icons/bell-solid.svg') }}");
+  mask-image: url("{{ url_for('static', filename='icons/bell-solid.svg') }}");
+  -webkit-mask-size: cover;
+  mask-size: cover;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  border: none;
+}
+
+.close-notif {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 13px;
+  height: 13px;
+  background-color: white;
+  -webkit-mask-image: url("{{ url_for('static', filename='icons/xmark-solid.svg') }}");
+  mask-image: url("{{ url_for('static', filename='icons/xmark-solid.svg') }}");
+  -webkit-mask-size: cover;
+  mask-size: cover;
+  -webkit-mask-position: center;
+  mask-position: center;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+  border: none;
+  cursor: pointer;
+}
+
     .container-editor {
         transition: opacity 0.3s ease, transform 0.3s ease;
     }
@@ -84,46 +142,52 @@
       background-size: cover;
     }
 
-/* Style de la modale */
-.modal {
-  position: fixed;
-  z-index: 1000;
-  left: 0;
-  top: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0,0,0,0.8);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.modal-content {
-  position: relative;
-  background-color: #fff;
-  padding: 20px;
-  max-width: 800px;
-  width: 90%;
-  border-radius: 8px;
-}
-.close {
-  position: absolute;
-  top: 10px;
-  right: 15px;
-  color: #aaa;
-  font-size: 28px;
-  font-weight: bold;
-  cursor: pointer;
-}
-.close:hover,
-.close:focus {
-  color: #000;
-}
+    /* Style de la modale */
+    .modal {
+      position: fixed;
+      z-index: 1000;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(0,0,0,0.8);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-content {
+      position: relative;
+      background-color: #fff;
+      padding: 20px;
+      max-width: 800px;
+      width: 90%;
+      border-radius: 8px;
+    }
+    .close {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      color: #aaa;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    .close:hover,
+    .close:focus {
+      color: #000;
+    }
+
+
 
 
   </style>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+
+  <!-- Exemple d'intégration HTML (facultatif) -->
+<div id="notification-container"></div>
+
 
   <div id="loading">Chargement...</div>
 
@@ -229,6 +293,7 @@
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script type="module" src="{{ url_for('static', filename='js/notificationhandler.js') }}"></script>
 
   <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2377950455851956"
      crossorigin="anonymous"></script>
@@ -257,10 +322,8 @@
 
 
 
-
-
   // Affichage de la modal au clic sur l'icône des tokens
-  document.querySelector('.tokens-container').addEventListener('click', function(e) {
+  $('.tokens-container').on('click', function(e) {
       e.preventDefault();
       document.getElementById('adsenseVideoModal').style.display = 'flex';
       // Ici, vous pouvez également insérer une logique pour ne charger l'annonce qu'une seule fois,
@@ -279,7 +342,6 @@
           modal.style.display = 'none';
       }
   });
-
 
   </script>
 </body>

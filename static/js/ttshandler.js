@@ -1,7 +1,10 @@
+import { showNotification } from '../js/notificationhandler.js';
+
+
 export function fetchTTS(text, model) {
     return new Promise((resolve, reject) => {
         $.ajax({
-            url: "https://nicaragua-safely-tell-distinguished.trycloudflare.com/synthesize", // Ton URL API de synthèse vocale
+            url: "/synthesize", // Ton URL API de synthèse vocale
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify({ text: text, voice: "zf_xiaobei" }), // Ton texte à convertir en audio
@@ -11,6 +14,7 @@ export function fetchTTS(text, model) {
             success: function (response) {
                 if (!response || response.size === 0) {
                     console.error("Réponse vide de l'API TTS.");
+                    showNotification("Erreur", "Réponse vide de l'API TTS", 5000, "error")
                     reject(new Error("Réponse vide de l'API TTS"));
                     return;
                 }
@@ -31,6 +35,7 @@ export function fetchTTS(text, model) {
                     if (audioUrl) {
                         model.startLive2DSpeech(audioUrl);
                     } else {
+                        showNotification("Erreur", "Aucun audio n'est associé à cet élément.", 5000, "error")
                         console.error("Aucun audio n'est associé à cet élément.");
                     }
                 });
@@ -39,6 +44,7 @@ export function fetchTTS(text, model) {
                 resolve(blobUrl);
             },
             error: function (xhr, status, error) {
+                showNotification("Erreur", "Erreur lors de la synthèse vocale.", 5000, "warning")
                 console.error("Erreur lors de la synthèse vocale :", error);
                 reject(new Error("Erreur lors de la synthèse vocale"));
             }

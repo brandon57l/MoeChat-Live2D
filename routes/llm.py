@@ -23,18 +23,26 @@ def init_front(app):
         return render_template("clip.html", cn=cn, anim=anim)
 
 def init_gemini(app):
+
     @login_required
     @app.route('/send_message', methods=['POST'])
     def send_message():
         # Vérifier que l'utilisateur a au moins 500 tokens
+
+        if not current_user.is_authenticated:
+            return jsonify({
+                'warning': "Oops ! Vous devez être connecté pour envoyer un message. Créez un compte ou connectez-vous 😉"
+            })
+        
         if current_user.tokens < 500:
             print(f"Vous avez plus assez de tokens pour envoyer un message.")
-            response_text = {"parts": [{"text": "Votre solde de tokens est insuffisant pour envoyer ce message. Veuillez recharger votre compte ou contacter le support pour plus d’informations."}]}
+            response_text = "Votre solde de tokens est insuffisant pour envoyer ce message. Veuillez recharger votre compte ou contacter le support pour plus d’informations."
             return jsonify({
-                    'gemini_response': response_text,
+                    'warning': response_text,
                     'history': current_user.get_history(),
                     'tokens': current_user.tokens
                 })
+        
 
         # Récupérer le message et l'historique envoyé par le client
         message = request.form.get('message')
