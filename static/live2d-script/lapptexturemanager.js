@@ -96,6 +96,41 @@ export class LAppTextureManager {
     setGlManager(glManager) {
         this._glManager = glManager;
     }
+    mergeImages(baseSrc, overlaySrc) {
+        return new Promise((resolve, reject) => {
+          const baseImage = new Image();
+          const overlayImage = new Image();
+          const canvas = document.createElement('canvas');
+          const ctx = canvas.getContext('2d');
+      
+          baseImage.crossOrigin = 'anonymous';
+          overlayImage.crossOrigin = 'anonymous';
+      
+          baseImage.onload = () => {
+            // Ajuste le canvas à la taille de la texture de base
+            canvas.width = baseImage.width;
+            canvas.height = baseImage.height;
+      
+            // Dessine la base
+            ctx.drawImage(baseImage, 0, 0);
+      
+            overlayImage.onload = () => {
+              // Dessine l'overlay par-dessus
+              ctx.drawImage(overlayImage, 0, 0);
+      
+              // Récupère le dataURL final
+              const mergedDataUrl = canvas.toDataURL('image/png');
+              resolve(mergedDataUrl);
+            };
+      
+            overlayImage.onerror = (err) => reject(err);
+            overlayImage.src = overlaySrc;
+          };
+      
+          baseImage.onerror = (err) => reject(err);
+          baseImage.src = baseSrc;
+        });
+      }   
 }
 export class TextureInfo {
     constructor() {

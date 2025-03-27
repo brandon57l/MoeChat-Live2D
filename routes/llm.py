@@ -16,6 +16,12 @@ def init_front(app):
     def index():
         return render_template("chat.html", messages=[])
 
+    @app.route("/clip")
+    def clip():
+        cn = request.args.get("cn")
+        anim = request.args.get("anim")
+        return render_template("clip.html", cn=cn, anim=anim)
+
 def init_gemini(app):
     @login_required
     @app.route('/send_message', methods=['POST'])

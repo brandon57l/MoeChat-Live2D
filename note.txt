@@ -1,5 +1,8 @@
-Afficher le nombre de token avec un parse pour que 10_000 sois afficher 10 a l'utilisateur
 Gerer l'afficheage des message, en afficher que 10 par 10 lors du load
+Gerer Le prompt et l'utilsation de token 
+
+Publicité
+
 Corriger l'affichage des messages erreur dans le chat container 
 Faire un notification handler avec error, warning et succes
 Faire un projet Koroko API, avec gradio sur colab 

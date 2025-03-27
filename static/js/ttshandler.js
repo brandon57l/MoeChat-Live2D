@@ -1,7 +1,7 @@
 export function fetchTTS(text, model) {
     return new Promise((resolve, reject) => {
         $.ajax({
-            url: "/synthesize", // Ton URL API de synthèse vocale
+            url: "https://nicaragua-safely-tell-distinguished.trycloudflare.com/synthesize", // Ton URL API de synthèse vocale
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify({ text: text, voice: "zf_xiaobei" }), // Ton texte à convertir en audio

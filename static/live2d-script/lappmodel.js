@@ -22,7 +22,7 @@ import * as LAppDefine from './lappdefine.js';
 import { LAppPal } from './lapppal.js';
 import { LAppWavFileHandler } from './lappwavfilehandler.js';
 import { CubismMoc } from './framework/src/model/cubismmoc.js';
-
+import { applyHairTextureOverlay } from './overlaymanager.js';
 
 
 var LoadStep;
@@ -61,6 +61,7 @@ export class LAppModel extends CubismUserModel {
         });
         
     }
+
 
     // Fonction pour jouer une animation spécifique
     playMotion(index) {
@@ -303,6 +304,27 @@ export class LAppModel extends CubismUserModel {
             }
         };
     }
+
+    setTextureVariant(type, option) {
+        if (type="haire") {
+            applyHairTextureOverlay(
+                option,
+                this._modelSetting,
+                this._modelHomeDir,
+                this._subdelegate.getTextureManager(),
+                this.getRenderer(),
+                () => {
+                    // Callback exécuté lorsque toutes les textures sont chargées
+                    this._state = LoadStep.CompleteSetup;
+                    console.log('Toutes les textures ont été chargées.');
+                }
+            );
+        }
+
+
+    }
+    
+
     setupTextures() {
         const usePremultiply = true;
         if (this._state == LoadStep.LoadTexture) {
@@ -329,6 +351,10 @@ export class LAppModel extends CubismUserModel {
             this._state = LoadStep.WaitLoadTexture;
         }
     }
+
+    
+         
+      
     reloadRenderer() {
         this.deleteRenderer();
         this.createRenderer();

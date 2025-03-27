@@ -117,18 +117,29 @@
   z-index: 1;
 } */
 
-/* Styles des messages avec un z-index supérieur */
-.message {
-  position: relative; /* Nécessaire pour que le z-index soit pris en compte */
-  user-select: none;
-  z-index: 3; /* Supérieur à .chat-gradient */
-  max-width: 90%;
-  margin-bottom: 7px;
-  padding: 9px 15px;
-  border-radius: 20px;
-  opacity: 0;
-  animation: fadeIn 0.4s forwards;
-}
+  /* Styles des messages avec un z-index supérieur */
+  .message {
+    position: relative; /* Nécessaire pour que le z-index soit pris en compte */
+    user-select: none;
+    z-index: 3; /* Supérieur à .chat-gradient */
+    max-width: 90%;
+    margin-bottom: 7px;
+    padding: 9px 15px;
+    border-radius: 20px;
+    opacity: 0;
+    animation: fadeIn 0.4s forwards;
+  }
+
+  .container-editor{
+    background-color: #FFFBE9;
+    padding: 10px;
+    border-radius: 10px 10px 0 0;
+    position: fixed;
+    bottom: 0;
+    width: 100%;
+    max-width: 520px;
+    z-index: 2;
+  }
 
 
       @keyframes fadeIn {
@@ -231,12 +242,6 @@
       /* position: absolute; */
 
     }
-    
-
-
-
-
-
 
     .translations {
       /* border-top: 1px solid #ffffff52; */
@@ -253,6 +258,28 @@
         display: block; /* Affiche l'élément avant l'animation */
         max-height: 500px; /* Ajuste selon ton contenu */
         opacity: 1;
+    }
+
+
+    .container-editor .label{
+      font-size: 15px;
+    }
+    .box-color{
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+    }
+    .item-color{
+      width: 20px;
+      height: 20px;
+      /* background-color: #7E6363; */
+      
+      border-radius: 30px;
+    }
+    .close-editor{
+      height: 15px;
+      width: 3px;
+      background-color: black;
     }
   
   

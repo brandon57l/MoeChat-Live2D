@@ -125,7 +125,71 @@ export class LAppLive2DManager {
     
         // Conserver la référence à l'instance courante
         const manager = this;
+
+        $(".item-color").on("click", function (event) {
+            const model = manager.getModel();
+            if (!model) {
+                console.error("Aucun modèle Live2D n'a été chargé !");
+                return;
+            }
+        
+            const type = $(this).data("type");
+            const option = $(this).data("color");
+            
+            if (!option) {
+                console.warn("Aucune couleur sélectionnée !");
+                return;
+            }
+        
+            // Appliquer la texture correspondante
+            model.setTextureVariant(type, option);
+        });
+
+        const clipMode = $("#clip")
+        if (clipMode) {
+            clipMode.on("click", async (event) => {
+                try {
+                    // Récupérer les paramètres de l'URL
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const cn = urlParams.get("cn");
+                    const anim = urlParams.get("anim");
     
+                    if (!cn || !anim) {
+                        console.error("Paramètres cn ou anim manquants dans l'URL !");
+                        return;
+                    }
+    
+                    // Récupère l'instance du modèle via le manager
+                    const model = manager.getModel();
+    
+                    if (!model) {
+                        console.error("Aucun modèle Live2D n'a été chargé !");
+                        return;
+                    }
+    
+                    // Appel de la synthèse vocale avec le paramètre cn
+                    const audioURL = await fetchTTS(cn, model);
+    
+                    // Démarre l'animation avec le numéro récupéré depuis l'URL
+                    model.startLive2DSpeech(audioURL, anim);
+    
+                } catch (error) {
+                    console.error("Erreur lors de l'appel à fetchTTS() :", error);
+                }
+            });
+        }
+        
+        
+        $("#orange").on("click", function () {
+            const model = manager.getModel();
+            if (!model) {
+                console.error("Aucun modèle Live2D n'a été chargé !");
+                return;
+            }
+            model.setTextureVariant("carrot_orange");
+        });
+        
+
         $("#message-form").submit(async (event) => {
             event.preventDefault(); // Empêche la soumission classique du formulaire
             

@@ -60,6 +60,16 @@
       mask-image: url("{{ url_for('static', filename='icons/circle-play-regular.svg') }}");
       border: none;
     }
+    .container-editor {
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .hidden {
+        opacity: 0;
+        transform: scale(0.95);
+        pointer-events: none; /* Empêche d'interagir avec l'élément caché */
+    }
+
     .tokens-container{
       display: flex;
       align-items: center;
@@ -73,10 +83,48 @@
       background-image: url("{{ url_for('static', filename='icons/piece-de-monnaie.png') }}");
       background-size: cover;
     }
+
+/* Style de la modale */
+.modal {
+  position: fixed;
+  z-index: 1000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0,0,0,0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.modal-content {
+  position: relative;
+  background-color: #fff;
+  padding: 20px;
+  max-width: 800px;
+  width: 90%;
+  border-radius: 8px;
+}
+.close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  color: #aaa;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.close:hover,
+.close:focus {
+  color: #000;
+}
+
+
   </style>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
 <body>
+
   <div id="loading">Chargement...</div>
 
   <!-- Barre de navigation -->
@@ -132,12 +180,60 @@
     </div>
   </div>
 
+  <div class="container-editor">
+      <div class="title poppins-medium">Avatar Editor <!-- <div class="close-editor"></div> --></div>
+      <div class="label poppins-regular">Hair</div>
+      <div class="box-color">
+        <div class="item-color" data-color="black" data-type="hair" style="background-color: #282828;"></div>
+        <div class="item-color" data-color="brun" data-type="hair" style="background-color: #6F4C3C;"></div>
+        <div class="item-color" data-color="blue" data-type="hair" style="background-color: #5163BD;"></div>
+        <div class="item-color" data-color="green" data-type="hair" style="background-color: #367F4F;"></div>
+        <div class="item-color" data-color="carrot_orange" data-type="hair" style="background-color: #e99206;"></div>
+        <div class="item-color" data-color="red_head" data-type="hair" style="background-color: #EB0C02;"></div>
+        <div class="item-color" data-color="pink" data-type="hair" style="background-color: #C276A8;"></div>
+      </div>
+      <div class="label poppins-regular">Top</div>
+      <div class="box-color"></div>
+      <div class="label poppins-regular">Bottom</div>
+      <div class="box-color"></div>
+  </div>
+
+
+
+  <!-- Modal pour la pub AdSense vidéo -->
+  <div id="adsenseVideoModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <!-- Zone dédiée à l'annonce AdSense -->
+      <div id="adsenseVideoContainer">
+        <!-- Code d'annonce AdSense pour le format vidéo.
+            Remplacez ce code par le code fourni par Google AdSense/Ad Manager pour votre format vidéo. -->
+        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
+        <!-- Exemple fictif : à adapter selon le format vidéo et votre configuration -->
+        <ins class="adsbygoogle"
+            style="display:block"
+            data-ad-client="ca-pub-XXXXXXXXXXXXXX"
+            data-ad-slot="YYYYYYYYYY"
+            data-ad-format="fluid"
+            data-ad-layout-key="-fb+5w+4e-db+86"></ins>
+        <script>
+            (adsbygoogle = window.adsbygoogle || []).push({});
+        </script>
+      </div>
+    </div>
+  </div>
+
+
+
   <script src="{{ url_for('static', filename='lib/live2dcubismcore.min.js') }}"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
   <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
 
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2377950455851956"
+     crossorigin="anonymous"></script>
   <script>
+    
     document.getElementById('message-input').addEventListener('focus', function(e) {
       e.preventDefault();
       e.target.focus({ preventScroll: true });
@@ -152,6 +248,39 @@
         initialHeight = window.innerHeight;
       }
     });
+    $(document).ready(function () {
+        $(".title").on("click", function () {
+            $(".container-editor").toggleClass("hidden");
+        });
+    });
+
+
+
+
+
+
+  // Affichage de la modal au clic sur l'icône des tokens
+  document.querySelector('.tokens-container').addEventListener('click', function(e) {
+      e.preventDefault();
+      document.getElementById('adsenseVideoModal').style.display = 'flex';
+      // Ici, vous pouvez également insérer une logique pour ne charger l'annonce qu'une seule fois,
+      // ou pour vérifier que la modal n'a pas été fermée prématurément.
+  });
+
+  // Fermeture de la modal avec le bouton "close"
+  document.querySelector('.modal .close').addEventListener('click', function() {
+      document.getElementById('adsenseVideoModal').style.display = 'none';
+  });
+
+  // Optionnel : fermeture si clic en dehors du contenu
+  window.addEventListener('click', function(e) {
+      var modal = document.getElementById('adsenseVideoModal');
+      if (e.target == modal) {
+          modal.style.display = 'none';
+      }
+  });
+
+
   </script>
 </body>
 </html>

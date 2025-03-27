@@ -6,6 +6,18 @@
 			"Haru.2048/texture_00.png",
 			"Haru.2048/texture_01.png"
 		],
+		"TextureVariants": {
+			"Hairs": {
+				"carrot_orange": [
+					"Haru.2048/hairs/carrot_orange_00.png",
+					"Haru.2048/hairs/carrot_orange_01.png"
+				],
+				"red_head": [
+					"Haru.2048/hairs/red_head_00.png",
+					"Haru.2048/hairs/red_head_01.png"
+				]
+			}
+		},
 		"Physics": "Haru.physics3.json",
 		"Pose": "Haru.pose3.json",
 		"DisplayInfo": "Haru.cdi3.json",

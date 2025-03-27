@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+  <title>Live2D Cubism Example</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
+
+  <style>
+    /* Styles de base */
+    html, body {
+      font-family: "Poppins", sans-serif;
+      overflow: hidden;
+      margin: 0;
+    }
+    html {
+      overscroll-behavior-x: none;
+      touch-action: none;
+    }
+    body {
+      display: flex;
+      justify-content: center;
+      background-color: #F4EAD5 !important;
+    }
+    body > canvas:only-child {
+      width: 100lvw;
+      height: 100lvh;
+    }
+    canvas {
+      position: absolute;
+      top: 15px;
+      max-width: 800px;
+      height: calc(95vh - 72px - 60px);
+      z-index: 0;
+      background-color: #F4EAD5;
+      transition: top 0.5s ease-out, height 0.5s ease-out;
+    }
+    canvas.keyboard-open {
+      top: 0;
+      height: 600px !important;
+    }
+    /* Bouton SVG pour l'envoi déjà existant */
+    #svgSendIconBtn {
+      background-color: #7E6363;
+      -webkit-mask-image: url("{{ url_for('static', filename='icons/paper-plane-regular.svg') }}");
+      mask-image: url("{{ url_for('static', filename='icons/paper-plane-regular.svg') }}");
+      border: none;
+    }
+    .svgAudiIconBtn{
+      background-color: #7E6363;
+      -webkit-mask-image: url("{{ url_for('static', filename='icons/circle-play-regular.svg') }}");
+      mask-image: url("{{ url_for('static', filename='icons/circle-play-regular.svg') }}");
+      border: none;
+    }
+    .container-editor {
+        transition: opacity 0.3s ease, transform 0.3s ease;
+    }
+
+    .hidden {
+        opacity: 0;
+        transform: scale(0.95);
+        pointer-events: none; /* Empêche d'interagir avec l'élément caché */
+    }
+
+    .tokens-container{
+      display: flex;
+      align-items: center;
+      text-align: center;
+      gap: 3px;
+      color: #7E6363 !important;
+    }
+    .token-icon{
+      width: 20px;
+      height: 20px;
+      background-image: url("{{ url_for('static', filename='icons/piece-de-monnaie.png') }}");
+      background-size: cover;
+    }
+  </style>
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body id="clip">
+
+  <script src="{{ url_for('static', filename='lib/live2dcubismcore.min.js') }}"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+
+  <script>
+
+    let initialHeight = window.innerHeight;
+    window.addEventListener('resize', () => {
+      if (window.innerHeight < initialHeight - 100) {
+        document.querySelector('canvas').classList.add('keyboard-open');
+      } else {
+        document.querySelector('canvas').classList.remove('keyboard-open');
+        initialHeight = window.innerHeight;
+      }
+    });
+
+  </script>
+</body>
+</html>
