@@ -343,6 +343,130 @@
       }
   });
 
+
+  // Variable globale pour la pagination
+let currentPage = 1;
+let loadingMessages = false;
+
+// Fonction pour charger des messages paginés
+function loadMessages(page) {
+  if (loadingMessages) return;
+  loadingMessages = true;
+
+  $.ajax({
+    url: '/load_messages',
+    type: 'GET',
+    data: { page: page },
+    success: function(data) {
+      if (data.error) {
+        console.error("Erreur :", data.error);
+        loadingMessages = false;
+        return;
+      }
+
+      // Les messages sont renvoyés du plus récent au plus ancien
+      // Pour les afficher dans l'ordre chronologique, on inverse la liste
+      let messages = data.messages.reverse();
+
+      messages.forEach(msg => {
+        // Construit le HTML du message
+        let messageHtml = `
+          <div class="message ${msg.sender === 'user' ? 'sent' : 'received'}" data-id="${msg.id}">
+            <div class="message-text">${msg.text}</div>
+            <div class="timestamp">${new Date(msg.created_at).toLocaleString()}</div>
+          </div>
+        `;
+        // Ajoute le message en haut du chat
+        $("#chat-box").prepend(messageHtml);
+      });
+
+      // Si on a chargé la première page, ajuster le scroll pour conserver la position
+      if (page === 1) {
+        $("#chat-box").scrollTop($("#chat-box")[0].scrollHeight);
+      }
+
+      if (data.has_next) {
+        currentPage++; // Prêt pour le prochain chargement
+      } else {
+        // Optionnel : désactiver le chargement si plus de messages
+        $(window).off('scroll', scrollHandler);
+      }
+      loadingMessages = false;
+    },
+    error: function(xhr) {
+      console.error("Erreur lors du chargement des messages", xhr);
+      loadingMessages = false;
+    }
+  });
+}
+
+// Fonction d'envoi de message
+async function sendMessage() {
+  let messageText = $("#message-input").val().trim();
+  if (messageText === "") return;
+
+  // Affichage immédiat du message de l'utilisateur
+  let sentMessageHtml = `
+    <div class="message sent">
+      <div class="message-text">${messageText}</div>
+      <div class="timestamp">${new Date().toLocaleString()}</div>
+    </div>
+  `;
+  $("#chat-box").append(sentMessageHtml);
+  $("#chat-box").animate({ scrollTop: $("#chat-box")[0].scrollHeight }, 500);
+  $("#message-input").val("");
+
+  // Envoyer le message via AJAX
+  try {
+    let data = await $.ajax({
+      url: '/send_message',
+      type: 'POST',
+      data: { message: messageText }
+    });
+
+    if (data.error) {
+      console.error("Erreur :", data.error);
+      return;
+    }
+
+    // Affiche la réponse du chatbot
+    let chatbotMsg = data.chatbot_message;
+    let receivedMessageHtml = `
+      <div class="message received" data-id="${chatbotMsg.id}">
+        <div class="message-text">${chatbotMsg.text}</div>
+        <div class="timestamp">${new Date(chatbotMsg.created_at).toLocaleString()}</div>
+      </div>
+    `;
+    $("#chat-box").append(receivedMessageHtml);
+    $("#chat-box").animate({ scrollTop: $("#chat-box")[0].scrollHeight }, 500);
+  } catch (error) {
+    console.error("Erreur lors de l'envoi du message", error);
+  }
+}
+
+// Handler de défilement pour charger les anciens messages
+function scrollHandler() {
+  // Si le scroll atteint le haut du conteneur, charger la page suivante
+  if ($("#chat-box").scrollTop() === 0) {
+    loadMessages(currentPage);
+  }
+}
+
+// Attache l'événement scroll au conteneur du chat
+$("#chat-box").on('scroll', scrollHandler);
+
+// Exemple d'attachement de l'événement d'envoi sur un bouton
+$("#send-button").on("click", function(e) {
+  e.preventDefault();
+  sendMessage();
+});
+
+// Au chargement de la page, chargez la première page des messages
+$(document).ready(function() {
+  loadMessages(currentPage);
+});
+
+
   </script>
 </body>
 </html>

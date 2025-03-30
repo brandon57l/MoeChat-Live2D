@@ -7,6 +7,7 @@ from routes.llm import init_front, init_gemini
 # from routes.tts import init_kokoro
 from routes.auth import init_auth
 from routes.static import serve_static
+from routes.message import init_message
 from extensions.login_manager import init_login_manager
 
 
@@ -20,9 +21,11 @@ init_login_manager(app)
 
 
 # Initialisation des routes
+init_message(app)
 init_auth(app)
 init_front(app)
 init_gemini(app)
+
 # init_kokoro(app)
 
 serve_static(app)

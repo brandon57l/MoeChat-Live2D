@@ -4,7 +4,7 @@ import { showNotification } from '../js/notificationhandler.js';
 export function fetchTTS(text, model) {
     return new Promise((resolve, reject) => {
         $.ajax({
-            url: "/synthesize", // Ton URL API de synthèse vocale
+            url: "https://scenario-representing-supplements-ringtone.trycloudflare.com/synthesize", // Ton URL API de synthèse vocale
             type: "POST",
             contentType: "application/json",
             data: JSON.stringify({ text: text, voice: "zf_xiaobei" }), // Ton texte à convertir en audio
