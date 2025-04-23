@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
-  <title>Live2D Cubism Example</title>
+  <title>Moechat2D</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
   
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -11,14 +11,27 @@
   <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
   
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
-  
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
   <link rel="stylesheet" href="{{ url_for('static', filename='css/poppins.css') }}">
-
+  <script type="importmap">
+    {
+      "imports": {
+        "@material/web/": "https://esm.run/@material/web/"
+      }
+    }
+  </script>
+  <script type="module">
+    import '@material/web/all.js';
+    import '@material/web/icon/icon.js'; // EST-CE QUE CET IMPORT EST PRÉSENT ?
+    import {styles as typescaleStyles} from '@material/web/typography/md-typescale-styles.js';
+    
+    document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+  </script>
   <style>
     /* Styles de base */
     html, body {
       font-family: "Poppins", sans-serif;
-      overflow: hidden;
+      overflow: hidden !important;
       margin: 0;
     }
     html {
@@ -36,11 +49,10 @@
     }
     canvas {
       position: absolute;
-      top: 15px;
+      bottom: 20px;
       max-width: 800px;
-      height: calc(95vh - 72px - 60px);
+      height: calc(95vh - 60px) !important;
       z-index: 0;
-      background-color: #F4EAD5;
       transition: top 0.5s ease-out, height 0.5s ease-out;
     }
     canvas.keyboard-open {
@@ -48,12 +60,12 @@
       height: 600px !important;
     }
     /* Bouton SVG pour l'envoi déjà existant */
-    #svgSendIconBtn {
-      background-color: #7E6363;
-      -webkit-mask-image: url("{{ url_for('static', filename='icons/paper-plane-regular.svg') }}");
-      mask-image: url("{{ url_for('static', filename='icons/paper-plane-regular.svg') }}");
-      border: none;
-    }
+      #svgSendIconBtn {
+        background-color: #7E6363;
+        -webkit-mask-image: url("{{ url_for('static', filename='icons/paper-plane-regular.svg') }}");
+        mask-image: url("{{ url_for('static', filename='icons/paper-plane-regular.svg') }}");
+        border: none;
+      }
     .svgAudiIconBtn{
       background-color: #7E6363;
       -webkit-mask-image: url("{{ url_for('static', filename='icons/circle-play-regular.svg') }}");
@@ -130,7 +142,6 @@
 
     .tokens-container{
       display: flex;
-      align-items: center;
       text-align: center;
       gap: 3px;
       color: #7E6363 !important;
@@ -176,10 +187,81 @@
     .close:focus {
       color: #000;
     }
+ 
+
+    
+/* Content Section Styles */
+.content-section {
+    margin-top: 60px;
+    width: 100%;
+    max-width: 520px;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out; /* Assurez-vous d'avoir la transition d'opacité */
+    position: absolute;
+    bottom: 0;
+    transform: translateY(50px);
+    z-index: 0; /* Important: s'assure que la section cachée est derrière la section active */
+}
+
+.content-section.active-content {
+    opacity: 1;
+    transform: translateY(0);
+    z-index: 1;  /* S'assure que la section active est au-dessus */
+    transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out; /* Redondant, mais assure la transition même si la classe est ajoutée en premier */
+}
+.content-section.fade-out {
+    opacity: 0;
+    transform: translateY(50px);
+    transition: opacity 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+.post{
+  margin-top: 3px;
+  padding: 10px;
+  background-color: #FFFBE9;
+  display: flex;
+  gap: 10px;
+}
+
+  .post .img{
+    min-height: 65px;
+    min-width: 115px;
+    background-color: #F4EAD5;
+    border-radius: 5px;
+
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    background-color: #e0e0e0; /* Fallback color */
+    overflow: hidden;     /* Prevents content from overflowing the padding */
+  }
 
 
 
+  .post .infos .title {
+    max-height: 65px; /* Limite la hauteur totale */
+    font-size: 15px;
 
+    color: rgb(34, 34, 34);
+
+    /* Propriétés pour le multi-lignes  */
+    display: -webkit-box; /* Needed for older webkit browsers */
+    -webkit-line-clamp: 2; /* Limit to 2 lines */
+    -webkit-box-orient: vertical; /* Needed for older webkit browsers */
+    overflow: hidden; /* Cacher le texte qui dépasse */
+    text-overflow: ellipsis; /*  Ceci ne fonctionne pas toujours correctement sur plusieurs lignes */
+  }
+  .post .infos .more{
+    display: flex;
+    color: #C6698B;
+    font-size: 13px;
+    font-weight: 400;
+  }
+
+  .transcriptIframe{
+    z-index: 100;
+    height: 100vh;
+    width: 100vw;
+  }
   </style>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
 </head>
@@ -189,15 +271,15 @@
 <div id="notification-container"></div>
 
 
-  <div id="loading">Chargement...</div>
+  <!-- <div id="loading">Chargement...</div> -->
 
   <!-- Barre de navigation -->
   <ul class="nav nav-underline poppins-extrabold">
     <li class="nav-item active">
-      <a class="nav-link active" aria-current="page" href="#">Home</a>
+      <a class="nav-link active" aria-current="page" onclick="changePage('home')" href="#">Home</a>
     </li>
     <li class="nav-item">
-      <a class="nav-link" href="#">Chat</a>
+      <a class="nav-link" onclick="changePage('chat')" href="#">Chat</a>
     </li>
     <li class="nav-item">
       <a class="nav-link" href="#">Profil</a>
@@ -215,8 +297,16 @@
       {% endif %}
     </li>
   </ul>
+  <div id="home" class="home content-section active-content" style="top: 0;">
 
-  <div class="chat-container">
+    <div class="post-container">
+
+    </div>
+
+  </div>
+  <div id="profil" class="profil content-section">profil</div>
+  <div id="chat"  class="chat-container content-section">
+    <canvas id="canvas"></canvas>
     <!-- Zone de chat -->
     <div class="chat-area d-flex flex-column" id="chat-box">
       <div class="chat-gradient"></div>
@@ -244,8 +334,9 @@
     </div>
   </div>
 
+<!-- 
   <div class="container-editor">
-      <div class="title poppins-medium">Avatar Editor <!-- <div class="close-editor"></div> --></div>
+      <div class="title poppins-medium">Avatar Editor</div>
       <div class="label poppins-regular">Hair</div>
       <div class="box-color">
         <div class="item-color" data-color="black" data-type="hair" style="background-color: #282828;"></div>
@@ -260,9 +351,7 @@
       <div class="box-color"></div>
       <div class="label poppins-regular">Bottom</div>
       <div class="box-color"></div>
-  </div>
-
-
+  </div> -->
 
   <!-- Modal pour la pub AdSense vidéo -->
   <div id="adsenseVideoModal" class="modal" style="display: none;">
@@ -270,33 +359,25 @@
       <span class="close">&times;</span>
       <!-- Zone dédiée à l'annonce AdSense -->
       <div id="adsenseVideoContainer">
-        <!-- Code d'annonce AdSense pour le format vidéo.
-            Remplacez ce code par le code fourni par Google AdSense/Ad Manager pour votre format vidéo. -->
-        <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js"></script>
-        <!-- Exemple fictif : à adapter selon le format vidéo et votre configuration -->
-        <ins class="adsbygoogle"
-            style="display:block"
-            data-ad-client="ca-pub-XXXXXXXXXXXXXX"
-            data-ad-slot="YYYYYYYYYY"
-            data-ad-format="fluid"
-            data-ad-layout-key="-fb+5w+4e-db+86"></ins>
-        <script>
-            (adsbygoogle = window.adsbygoogle || []).push({});
-        </script>
+        
+        
       </div>
     </div>
   </div>
 
 
 
+
   <script src="{{ url_for('static', filename='lib/live2dcubismcore.min.js') }}"></script>
   <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-  <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <!-- <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script> -->
   <script type="module" src="{{ url_for('static', filename='js/notificationhandler.js') }}"></script>
 
-  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2377950455851956"
-     crossorigin="anonymous"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2377950455851956" crossorigin="anonymous"></script>
+
+
+
   <script>
     
     document.getElementById('message-input').addEventListener('focus', function(e) {
@@ -344,61 +425,218 @@
   });
 
 
-  // Variable globale pour la pagination
-let currentPage = 1;
+  let currentPage = 1;
 let loadingMessages = false;
+let hasMoreMessages = true; // Flag pour indiquer s'il reste encore des messages
 
-// Fonction pour charger des messages paginés
+// Fonction pour charger les messages paginés
 function loadMessages(page) {
-  if (loadingMessages) return;
-  loadingMessages = true;
+    if (loadingMessages || !hasMoreMessages) return;
+    loadingMessages = true;
 
-  $.ajax({
-    url: '/load_messages',
-    type: 'GET',
-    data: { page: page },
-    success: function(data) {
-      if (data.error) {
-        console.error("Erreur :", data.error);
-        loadingMessages = false;
-        return;
-      }
+    const chatBox = $("#chat-box");
+    // Stocker le scroll top et la hauteur du container AVANT d'ajouter des messages
+    const scrollTopBefore = chatBox.scrollTop();
+    const scrollHeightBeforeLoad = chatBox[0].scrollHeight;
 
-      // Les messages sont renvoyés du plus récent au plus ancien
-      // Pour les afficher dans l'ordre chronologique, on inverse la liste
-      let messages = data.messages.reverse();
+    $.ajax({
+        url: '/load_messages',
+        type: 'GET',
+        data: { page: page },
+        success: function(data) {
+            if (data.error) {
+                console.error("Erreur :", data.error);
+                loadingMessages = false;
+                return;
+            }
 
-      messages.forEach(msg => {
-        // Construit le HTML du message
-        let messageHtml = `
-          <div class="message ${msg.sender === 'user' ? 'sent' : 'received'}" data-id="${msg.id}">
-            <div class="message-text">${msg.text}</div>
-            <div class="timestamp">${new Date(msg.created_at).toLocaleString()}</div>
-          </div>
-        `;
-        // Ajoute le message en haut du chat
-        $("#chat-box").prepend(messageHtml);
-      });
+            if (data.messages && data.messages.length > 0) {
+                let messages = data.messages;
+                // Pour les pages supérieures à 1, on veut insérer les messages plus anciens en haut 
+                // et donc conserver l'ordre chronologique. Pour cela, on inverse le tableau.
+                // if (page > 1) {
+                //     messages.reverse();
+                // }
 
-      // Si on a chargé la première page, ajuster le scroll pour conserver la position
-      if (page === 1) {
-        $("#chat-box").scrollTop($("#chat-box")[0].scrollHeight);
-      }
+                messages.forEach(msg => {
+                    let messageHtml = '';
+                    // --- Construction du HTML du message ---
+                    if (msg.sender === "user") {
+                        messageHtml = `
+                        <div class="d-flex flex-column align-items-end mb-2">
+                            <div class="message sent shadow-box">
+                                <div class="mb-0">${msg.text}</div>
+                            </div>
+                        </div>`;
+                    } else if (msg.sender === "assistant") {
+                        try {
+                            let jsonString = msg.text.trim();
+                            if (jsonString.startsWith("```json")) {
+                                jsonString = jsonString.replace(/^```json\s*/, '').replace(/\s*```$/, '');
+                            }
+                            const jsonMsg = JSON.parse(jsonString);
+                            messageHtml = `
+                            <div class="d-flex flex-row align-items-center mb-2">
+                                <div class="message received shadow-box" style="cursor: pointer;">
+                                    <div class="mb-0">
+                                        <div class="cn-text" style="display:block">${jsonMsg.cn}</div>
+                                        <div class="translations" style="color:#dce1de">
+                                            🇫🇷 : ${jsonMsg.fr}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="d-flex flex-column align-items-center" style="z-index:1">
+                                    <div class="no-close-keyboard audioIconContainer" onclick="">
+                                        <svg class="svgAudiIconBtn" width="13" height="13"></svg>
+                                    </div>
+                                </div>
+                            </div>`;
+                        } catch(e) {
+                            console.error("Error parsing assistant JSON:", e, "Original text:", msg.text);
+                            messageHtml = `
+                            <div class="d-flex flex-row align-items-center mb-2">
+                                <div class="message received shadow-box">
+                                    <div class="mb-0 text-danger">Error parsing message: ${msg.text}</div>
+                                </div>
+                            </div>`;
+                        }
+                    }
+                    // --- Fin de la construction du HTML ---
 
-      if (data.has_next) {
-        currentPage++; // Prêt pour le prochain chargement
-      } else {
-        // Optionnel : désactiver le chargement si plus de messages
-        $(window).off('scroll', scrollHandler);
-      }
-      loadingMessages = false;
-    },
-    error: function(xhr) {
-      console.error("Erreur lors du chargement des messages", xhr);
-      loadingMessages = false;
-    }
-  });
+                    
+
+                    if (messageHtml) {
+                        // Pour la page 1, on affiche en bas, pour les pages suivantes on insère en haut.
+                        if (page === 1) {
+                            chatBox.prepend(messageHtml);
+                        } else {
+                            chatBox.prepend(messageHtml);
+                        }
+                    }
+
+
+                });
+
+                    var longPressTimer;
+                    var longPressThreshold = 600; // durée en ms
+                
+                    // Gestion de l'appui long et du clic sur le dernier message ajouté
+                    $("#chat-box .message.received")
+                        // Début de l'appui
+                        .on("mousedown touchstart", function(e) {
+                            var $thisMessage = $(this);
+                            // Démarre le timer pour l'appui long
+                            longPressTimer = setTimeout(function() {
+                                // Appui long détecté : copie le texte chinois
+                                var textToCopy = $thisMessage.find(".cn-text").text();
+                                if (navigator.clipboard && navigator.clipboard.writeText) {
+                                    navigator.clipboard.writeText(textToCopy).then(function() {
+                                        console.log("Texte chinois copié :", textToCopy);
+                                    }).catch(function(err) {
+                                        console.error("Erreur lors de la copie :", err);
+                                    });
+                                } else {
+                                    // Fallback pour d'anciens navigateurs
+                                    var $tempInput = $("<input>");
+                                    $("body").append($tempInput);
+                                    $tempInput.val(textToCopy).select();
+                                    document.execCommand("copy");
+                                    $tempInput.remove();
+                                }
+                                // Optionnel : afficher un feedback visuel (ex. un toast) ici
+                            }, longPressThreshold);
+                        })
+                        // Fin de l'appui long ou annulation si le mouvement sort de l'élément
+                        .on("mouseup mouseleave touchend", function(e) {
+                            clearTimeout(longPressTimer);
+                        })
+                        // Gestion du clic simple pour afficher/masquer la traduction
+                        .on("click", function(e) {
+                            // Si l'événement long press a été déclenché, on empêche l'action click
+                            if (e.handled === true) {
+                                return;
+                            }
+                            var translations = $(this).find(".translations");
+                        
+                            if (translations.hasClass("show")) {
+                                // Masquage de l'élément : on fixe la hauteur, puis on la ramène à 0
+                                translations.css("max-height", translations[0].scrollHeight + "px"); // Fixe la hauteur actuelle
+                                setTimeout(() => {
+                                    translations.css({ "max-height": "0", "opacity": "0" });
+                                }, 10);
+                            
+                                // Après la fin de la transition, on cache complètement l'élément
+                                setTimeout(() => {
+                                    translations.css("display", "none");
+                                    translations.removeClass("show");
+                                }, 300); // Durée de la transition (doit correspondre à celle du CSS)
+                            } else {
+                                // Affichage de l'élément : on démarre avec display block mais avec max-height et opacité à 0
+                                translations.css({ "display": "block", "max-height": "0", "opacity": "0" });
+                                
+                                // Forcer une reflow pour que le navigateur prenne bien en compte l'état initial
+                                translations[0].offsetHeight;
+                            
+                                // Ensuite, on déclenche la transition pour que l'élément se déploie et s'affiche en fondu
+                                setTimeout(() => {
+                                    translations.css({ "max-height": translations[0].scrollHeight + "px", "opacity": "1" });
+                                }, 10);
+                                translations.addClass("show");
+                            }
+                        });
+
+                // Ajuster le scroll après ajout des messages
+                const scrollHeightAfter = chatBox[0].scrollHeight;
+                if (page > 1) {
+                    // Calcule la différence de hauteur et ajuste la position du scroll 
+                    const heightDifference = scrollHeightAfter - scrollHeightBeforeLoad;
+                    chatBox.scrollTop(scrollTopBefore + heightDifference);
+                } else {
+                    // Pour le premier chargement, on se positionne en bas
+                    chatBox.scrollTop(scrollHeightAfter);
+                }
+
+                // Mise à jour de la pagination
+                if (data.has_next) {
+                    currentPage++;
+                    hasMoreMessages = true;
+                } else {
+                    hasMoreMessages = false;
+                    console.log("No more messages to load.");
+                    // Optionnel: désactiver l'écouteur de scroll ici si nécessaire
+                }
+            } else {
+                hasMoreMessages = false;
+                console.log("No messages returned, assuming end of history.");
+                // Optionnel: désactiver l'écouteur de scroll ici si nécessaire
+            }
+
+            loadingMessages = false;
+        },
+        error: function(xhr) {
+            console.error("Erreur lors du chargement des messages", xhr);
+            loadingMessages = false;
+            // Optionnel: définir hasMoreMessages à false ou implémenter une logique de retry
+        }
+    });
 }
+
+// --- Définir le gestionnaire d'événement scroll ---
+// Ce gestionnaire est défini en dehors de toute autre fonction afin de pouvoir être retiré si besoin.
+function scrollHandler() {
+    const chatBox = $("#chat-box");
+    // Charger de nouveaux messages quand on se trouve près du haut du chat (moins de 50px)
+    if (chatBox.scrollTop() < 50) {
+        if (!loadingMessages && hasMoreMessages) {
+            console.log("Scroll triggered loading page:", currentPage);
+            loadMessages(currentPage);
+        }
+    }
+}
+
+// Exemple d'ajout de l'écouteur de scroll
+$("#chat-box").on('scroll', scrollHandler);
+
 
 // Fonction d'envoi de message
 async function sendMessage() {
@@ -468,5 +706,219 @@ $(document).ready(function() {
 
 
   </script>
+
+<script>
+function changePage(page) {
+  const contentSections = document.querySelectorAll('.content-section');
+  
+  // Ajouter une classe intermédiaire qui lance la disparition
+  contentSections.forEach(section => {
+    if(section.classList.contains('active-content')) {
+      section.classList.add('fade-out'); 
+      section.addEventListener('transitionend', function handler() {
+        section.classList.remove('active-content', 'fade-out');
+        section.removeEventListener('transitionend', handler);
+      });
+    }
+  });
+
+  // Trouver et afficher la nouvelle section
+  const pageElem = document.querySelector("#" + page);
+  if (pageElem) {
+    // Optionnel : attendre un court délai pour que l'animation de disparition débute
+    setTimeout(() => {
+      pageElem.classList.add('active-content');
+    }, 50);
+  } else {
+    console.error("Element with id '" + page + "' not found.");
+  }
+}
+
+
+function loadPost(params) {
+  
+fetch('https://qingplay.pythonanywhere.com/json', {
+    method: 'GET',
+    headers: {
+        'Content-Type': 'application/json'
+    }
+})
+.then(response => {
+    if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+})
+.then(data => {
+    const transcriptContainer = document.querySelector('.post-container');
+    const errorDisplay = document.getElementById('error-message');
+
+    if (!transcriptContainer) {
+        console.error('Element with class "post-container" not found.');
+        if (errorDisplay) {
+            errorDisplay.textContent = 'Failed to find the container element (.post-container).';
+        }
+        return;
+    }
+
+    if (errorDisplay) {
+        errorDisplay.textContent = '';
+    }
+
+    while (transcriptContainer.firstChild) {
+        transcriptContainer.removeChild(transcriptContainer.firstChild);
+    }
+
+    if (!Array.isArray(data)) {
+        console.error('Received data is not an array:', data);
+        if (errorDisplay) {
+            errorDisplay.textContent = 'Received invalid data format from the server.';
+        }
+        return;
+    }
+
+    if (data.length === 0) {
+        console.info('Received empty data array.');
+        transcriptContainer.textContent = 'No transcripts available at the moment.';
+        return;
+    }
+
+    data.forEach(transcript => {
+        if (typeof transcript !== 'object' || transcript === null) {
+            console.warn('Skipping invalid item in data array:', transcript);
+            return;
+        }
+
+        // Create HTML elements dynamically
+        const postDiv = document.createElement('a'); // <<< postDiv is created here
+        postDiv.href = "#"
+        postDiv.classList.add('post');
+
+        // ... (imgDiv, infosDiv, titleDiv, moreDiv creation and appending) ...
+        // (Make sure all these are correctly created and appended as in your previous code)
+
+        const imgDiv = document.createElement('div');
+        imgDiv.classList.add('img');
+        if (transcript.video_id) {
+            const thumbnailUrl = `https://img.youtube.com/vi/${transcript.video_id}/hqdefault.jpg`;
+            imgDiv.style.backgroundImage = `url('${thumbnailUrl}')`;
+            imgDiv.style.backgroundSize = 'cover';
+            imgDiv.style.backgroundPosition = 'center';
+            imgDiv.style.backgroundRepeat = 'no-repeat';
+        } else {
+            imgDiv.style.backgroundColor = '#e0e0e0';
+        }
+
+        const infosDiv = document.createElement('div');
+        infosDiv.classList.add('infos');
+
+        const titleDiv = document.createElement('div');
+        titleDiv.classList.add('title');
+        titleDiv.textContent = transcript.title || 'No Title';
+
+        const moreDiv = document.createElement('div');
+        moreDiv.classList.add('more');
+        moreDiv.textContent = transcript.channel_name || 'Unknown Channel';
+
+        infosDiv.appendChild(titleDiv);
+        infosDiv.appendChild(moreDiv);
+
+        postDiv.appendChild(imgDiv);      // <<< Appending children to postDiv
+        postDiv.appendChild(infosDiv);  // <<< Appending children to postDiv
+
+        transcriptContainer.appendChild(postDiv);
+
+        // --- CORRECTED ONCLICK EVENT HANDLER ---
+        // Ensure postDiv is indeed an HTMLElement here
+        if (postDiv && typeof postDiv.addEventListener === 'function') {
+            postDiv.addEventListener('click', function() {
+                // Check if transcript.video_id is valid before passing
+                if (transcript && transcript.video_id) {
+                    transcriptIframe(transcript.video_id);
+                } else {
+                    console.error("Cannot create iframe: video_id is missing for this transcript.", transcript);
+                }
+            });
+        } else {
+            console.error("Could not attach click listener: postDiv is not a valid element.", postDiv);
+        }
+    });
+})
+.catch(error => {
+    console.error('Fetch error:', error);
+    const errorDisplay = document.getElementById('error-message');
+    if (errorDisplay) {
+        errorDisplay.textContent = `Failed to load transcripts: ${error.message}`;
+    }
+    const transcriptContainer = document.querySelector('.post-container');
+    if (transcriptContainer) {
+        while (transcriptContainer.firstChild) {
+            transcriptContainer.removeChild(transcriptContainer.firstChild);
+        }
+    }
+});
+
+function transcriptIframe(videoId) { // Renamed 'id' to 'videoId' for clarity
+  const body = document.querySelector("body");
+
+  if (!body) {
+    console.error("Body element not found.");
+    return;
+  }
+
+  // It's good practice to check if an iframe for this video already exists
+  // or if you want multiple iframes for the same video.
+  // For simplicity, this example will always create a new one.
+
+  const iframe = document.createElement("iframe");
+
+  // Assuming videoId is just the YouTube video ID, not a full URL.
+  // You need to construct the embed URL for YouTube.
+  const embedUrl = `https://qingplay.pythonanywhere.com/vid/${videoId}`;
+
+  iframe.src = embedUrl;
+  iframe.classList.add("transcriptIframe");
+  iframe.width = "640";
+  iframe.height = "360";
+  iframe.frameBorder = "0";
+  iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"; // Recommended by YouTube
+  iframe.allowFullscreen = true;
+  iframe.title = "YouTube video player"; // Good for accessibility
+
+  body.appendChild(iframe);
+}
+}
+
+  loadPost()
+
+  function transcriptIframe(id) {
+    const body = document.querySelector("body");
+
+    if (!body) {
+      console.error("Body element not found.");
+      return; // Stop if the body element is missing
+    } 
+
+    // Create the iframe element
+    const iframe = document.createElement("iframe");
+
+    // Set the iframe's attributes
+    iframe.src = "https://qingplay.pythonanywhere.com/vid/"+id;  // Assuming 'id' is the URL for the iframe content
+    iframe.classList.add("transcriptIframe"); // Add the class
+
+    // Optional:  Add more attributes for better control
+    iframe.width = "100vw";   // Or whatever width you prefer
+    iframe.height = "100vh";  // Or whatever height you prefer
+    iframe.frameBorder = "0"; // Remove the border (optional)
+    iframe.allowFullscreen = true; // Allow fullscreen mode (if needed)
+
+    // Append the iframe to the body
+    body.appendChild(iframe);
+  }
+
+
+
+</script>
+
 </body>
 </html>

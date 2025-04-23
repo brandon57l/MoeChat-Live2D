@@ -1,0 +1,794 @@
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+  <title>Live2D Cubism Example</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, interactive-widget=resizes-content">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/poppins.css') }}">
+  <script type="importmap">
+    {
+      "imports": {
+        "@material/web/": "https://esm.run/@material/web/"
+      }
+    }
+  </script>
+  <script type="module">
+    import '@material/web/all.js';
+    import '@material/web/icon/icon.js';
+    import {styles as typescaleStyles} from '@material/web/typography/md-typescale-styles.js';
+
+    document.adoptedStyleSheets.push(typescaleStyles.styleSheet);
+  </script>
+  <style>
+    /* Styles de base */
+    html, body {
+      font-family: "Poppins", sans-serif;
+      overflow: hidden;
+      margin: 0;
+    }
+    html {
+      overscroll-behavior-x: none;
+      touch-action: none;
+    }
+    body {
+      display: flex;
+      flex-direction: column; /* Changed to column */
+      align-items: center; /* Center content horizontally */
+      background-color: #F4EAD5 !important;
+      min-height: 100vh; /* Ensure body takes full height */
+    }
+    /* Removed body > canvas:only-child rule */
+    canvas {
+      position: absolute; /* Keep canvas positioned */
+      top: 55px; /* Adjusted top based on nav height */
+      left: 50%; /* Center horizontally */
+      transform: translateX(-50%); /* Fine-tune centering */
+      max-width: 800px;
+      width: 90%; /* Responsive width */
+      height: calc(95vh - 72px - 60px); /* Adjust as needed */
+      z-index: 0;
+      background-color: #F4EAD5;
+      transition: top 0.5s ease-out, height 0.5s ease-out;
+    }
+    canvas.keyboard-open {
+      top: 0;
+      height: 600px !important;
+    }
+
+    /* Navigation Bar Styles */
+    .nav {
+        width: 100%;
+        max-width: 800px; /* Match canvas max-width or adjust */
+        padding: 0 15px; /* Add some padding */
+        z-index: 10; /* Ensure nav is above canvas */
+        position: relative; /* Needed for z-index */
+        background-color: #F4EAD5; /* Match body background */
+    }
+
+    /* Content Section Styles */
+    .content-section {
+        width: 100%;
+        max-width: 520px; /* Match canvas width */
+        padding: 10px 15px 70px 15px; /* Add padding, space for chat input */
+        opacity: 0;
+        transition: opacity 0.5s ease-in-out;
+        position: absolute; /* Position sections absolutely */
+        top: 55px; /* Below nav bar */
+        left: 50%;
+        transform: translateX(-50%);
+        height: calc(100vh - 55px); /* Full height minus nav */
+        overflow-y: auto; /* Allow scrolling within the section */
+        pointer-events: none; /* Prevent interaction when hidden */
+        z-index: 1; /* Below nav, above canvas potentially */
+        display: flex; /* Use flex for chat layout */
+        flex-direction: column; /* Stack elements vertically */
+    }
+    .content-section.active-content {
+        opacity: 1;
+        pointer-events: auto; /* Allow interaction when active */
+        z-index: 5; /* Bring active content above others */
+    }
+
+    /* Specific Content Styles (e.g., Chat Container) */
+    .chat-container {
+        display: flex;
+        flex-direction: column;
+        height: 100%; /* Take full height of parent content-section */
+        /* remove position: absolute and bottom:0 if set previously */
+    }
+    .chat-area {
+        flex-grow: 1; /* Allow chat area to take available space */
+        overflow-y: auto; /* Scroll within chat area */
+        position: relative; /* Needed for gradient */
+        padding-bottom: 10px; /* Space above input */
+    }
+     .chat-input-wrapper {
+        margin-top: auto; /* Push input to the bottom */
+        width: 100%;
+        padding: 10px 0; /* Add some padding */
+        background-color: #F4EAD5; /* Match background */
+        position: sticky; /* Stick to bottom */
+        bottom: 0;
+    }
+
+    /* --- Other existing styles remain here --- */
+
+    /* Bouton SVG pour l'envoi déjà existant */
+      #svgSendIconBtn {
+        background-color: #7E6363;
+        -webkit-mask-image: url("{{ url_for('static', filename='icons/paper-plane-regular.svg') }}");
+        mask-image: url("{{ url_for('static', filename='icons/paper-plane-regular.svg') }}");
+        border: none;
+      }
+    .svgAudiIconBtn{
+      background-color: #7E6363;
+      -webkit-mask-image: url("{{ url_for('static', filename='icons/circle-play-regular.svg') }}");
+      mask-image: url("{{ url_for('static', filename='icons/circle-play-regular.svg') }}");
+      border: none;
+    }
+    /* ... (rest of your existing SVG, notification, editor, modal, etc. styles) ... */
+     .tokens-container{
+      display: flex;
+      align-items: center; /* Vertically align icon and text */
+      text-align: center;
+      gap: 3px;
+      color: #7E6363 !important;
+    }
+    .token-icon{
+      width: 20px;
+      height: 20px;
+      background-image: url("{{ url_for('static', filename='icons/piece-de-monnaie.png') }}");
+      background-size: cover;
+    }
+
+    .modal {
+      /* ... modal styles ... */
+    }
+    .modal-content {
+      /* ... modal content styles ... */
+    }
+    .close {
+      /* ... close button styles ... */
+    }
+     /* --- Ensure message styles are correct --- */
+
+    /* Ensure alignment helpers work */
+     .d-flex.flex-column.align-items-end {
+        width: 100%; /* Take full width to allow alignment */
+    }
+     .d-flex.flex-column.align-items-start {
+       width: 100%; /* Take full width to allow alignment */
+    }
+    .d-flex.flex-row.align-items-center {
+       width: 100%; /* Take full width to allow alignment */
+       justify-content: flex-start; /* Align received messages to the left */
+    }
+     /* Styles for translation toggle */
+    .translations {
+        color: #dce1de;
+        max-height: 0;
+        opacity: 0;
+        overflow: hidden;
+        transition: max-height 0.3s ease-out, opacity 0.3s ease-out;
+        display: none; /* Initially hidden */
+        font-size: 0.9em;
+        margin-top: 5px;
+    }
+
+    .translations.show {
+        display: block; /* Make visible for transition */
+        /* max-height and opacity are set by JS */
+    }
+    .input-container {
+        position: relative;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        background-color: white; /* Or your desired background */
+        border-radius: 20px; /* Rounded corners */
+        padding: 5px 10px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    #sendIconContainer {
+        position: absolute;
+        right: 10px;
+        top: 50%;
+        transform: translateY(-50%);
+        cursor: pointer;
+        padding: 5px; /* Easier clicking */
+    }
+    #svgSendIconBtn {
+        /* Your existing mask styles */
+         width: 18px;
+         height: 18px;
+         display: block; /* Ensure SVG takes space */
+    }
+
+
+  </style>
+  <!-- Keep original style.css link if it contains other necessary styles -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+
+  <div id="loading">Chargement...</div> <!-- Keep if used -->
+  <div id="notification-container"></div> <!-- Keep if used -->
+
+  <!-- Barre de navigation -->
+  <!-- Add id="main-nav" for easier selection in JS -->
+  <ul id="main-nav" class="nav nav-underline poppins-extrabold">
+    <li class="nav-item">
+      <!-- Add data-target, remove href="#", make it active initially -->
+      <a class="nav-link active" aria-current="page" href="#" data-target="home-content">Home</a>
+    </li>
+    <li class="nav-item">
+      <!-- Add data-target, remove href="#" -->
+      <a class="nav-link" href="#" data-target="chat-content">Chat</a>
+    </li>
+    <li class="nav-item">
+      <!-- Add data-target, remove href="#" -->
+      <a class="nav-link" href="#" data-target="profil-content">Profil</a>
+    </li>
+    <!-- Token/Login link - keep as is -->
+    <li class="nav-item ml-auto">
+      {% if current_user.is_authenticated %}
+        <a class="nav-link tokens-container" href="#"> <!-- Keep href="#" for modal trigger -->
+          {{ "{:.0f}".format(current_user.tokens / 1000) }}
+          <div class="token-icon"></div>
+        </a>
+      {% else %}
+        <a class="nav-link poppins-semibold" href="{{ url_for('login') }}" style="color: #C6698B; font-size: 13px;">Se connecter</a>
+      {% endif %}
+    </li>
+  </ul>
+
+  <!-- Canvas for Live2D -->
+  <!-- Make sure canvas exists if needed by main.js -->
+  <canvas id="live2d-canvas"></canvas>
+
+  <!-- Content Sections -->
+  <!-- Add id matching data-target, add common class 'content-section' -->
+  <!-- Make 'home-content' active initially -->
+  <div id="home-content" class="content-section active-content">
+      <h2>Home Content</h2>
+      <p>This is the home section.</p>
+      <!-- Add other home specific elements here -->
+  </div>
+
+  <div id="chat-content" class="content-section ">
+    <!-- Move the chat-container structure inside here -->
+    <div class="chat-container">
+      <!-- Zone de chat -->
+      <div class="chat-area d-flex flex-column" id="chat-box">
+        <div class="chat-gradient"></div> <!-- Keep if used -->
+        <div class="message-container">
+          <!-- Messages will be loaded here by AJAX -->
+        </div>
+      </div>
+
+      <!-- Formulaire d'envoi -->
+      <div class="chat-input-wrapper">
+        <form id="message-form" class="d-flex">
+            <div class="input-container">
+              <input type="text" name="message" id="message-input" class="chat-input poppins-medium" placeholder="Tapez votre message..." required>
+              <div id="sendIconContainer" class="no-close-keyboard" onclick="sendMessage(event); return false;">
+                <svg id="svgSendIconBtn" width="18" height="18"></svg>
+              </div>
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <div id="profil-content" class="content-section">
+      <h2>Profil Content</h2>
+      <p>User profile information goes here.</p>
+      <!-- Add the Avatar Editor here if it belongs to the profile -->
+       <!-- <div class="container-editor"> ... editor content ... </div> -->
+  </div>
+
+  <!-- Modal (Keep outside content sections) -->
+  <div id="adsenseVideoModal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <span class="close">×</span>
+      <div id="adsenseVideoContainer">
+        <!-- Ad content -->
+      </div>
+    </div>
+  </div>
+
+  <!-- Scripts -->
+  <script src="{{ url_for('static', filename='lib/live2dcubismcore.min.js') }}"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+  <script type="module" src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script type="module" src="{{ url_for('static', filename='js/notificationhandler.js') }}"></script>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-2377950455851956" crossorigin="anonymous"></script>
+
+  <script>
+    // --- Your existing JS for keyboard handling, modal, message loading etc. ---
+    document.getElementById('message-input').addEventListener('focus', function(e) {
+      // ... (keep existing focus logic)
+    });
+
+    let initialHeight = window.innerHeight;
+    window.addEventListener('resize', () => {
+      const canvas = document.querySelector('#live2d-canvas'); // Select canvas specifically
+      if (canvas) { // Check if canvas exists
+          if (window.innerHeight < initialHeight - 100) {
+            canvas.classList.add('keyboard-open');
+          } else {
+            canvas.classList.remove('keyboard-open');
+            initialHeight = window.innerHeight;
+          }
+      }
+    });
+
+     // Keep editor toggle if used
+     $(document).ready(function () {
+         $(".title").on("click", function () { // Assuming .title is part of your editor
+             $(".container-editor").toggleClass("hidden");
+         });
+     });
+
+    // Keep Modal JS
+    $('.tokens-container').on('click', function(e) {
+      e.preventDefault(); // Prevent default link behavior
+      $('#adsenseVideoModal').css('display', 'flex');
+    });
+    $('.modal .close').on('click', function() {
+      $('#adsenseVideoModal').css('display', 'none');
+    });
+    $(window).on('click', function(e) {
+      if ($(e.target).is('#adsenseVideoModal')) {
+        $('#adsenseVideoModal').css('display', 'none');
+      }
+    });
+
+
+    // --- Message Loading and Sending Logic (Keep as is, but ensure selectors target elements *inside* the chat section) ---
+    let currentPage = 1;
+    let loadingMessages = false;
+    let hasMoreMessages = true;
+
+    function loadMessages(page) {
+        if (loadingMessages || !hasMoreMessages) return;
+        loadingMessages = true;
+
+        // Select chat-box *within* the chat content section
+        const chatBox = $("#chat-content #chat-box");
+        if (!chatBox.length) {
+            console.error("Chat box not found for loading messages.");
+            loadingMessages = false;
+            return;
+        }
+        const messageContainer = chatBox.find(".message-container");
+
+        const scrollTopBefore = chatBox.scrollTop();
+        const scrollHeightBeforeLoad = chatBox[0].scrollHeight;
+
+        $.ajax({
+            url: '/load_messages', // Your existing endpoint
+            type: 'GET',
+            data: { page: page },
+            success: function(data) {
+                if (data.error) {
+                    console.error("Erreur :", data.error);
+                    loadingMessages = false;
+                    return;
+                }
+
+                if (data.messages && data.messages.length > 0) {
+                    let messagesHtml = ""; // Build HTML string first
+                    data.messages.forEach(msg => {
+                        let messageHtml = '';
+                        if (msg.sender === "user") {
+                            messageHtml = `
+                            <div class="d-flex flex-column align-items-end mb-2">
+                                <div class="message sent shadow-box">
+                                    <div class="mb-0">${marked.parseInline(msg.text)}</div>
+                                </div>
+                            </div>`;
+                        } else if (msg.sender === "assistant") {
+                           try {
+                                let jsonString = msg.text.trim();
+                                // Robust JSON parsing (handle potential markdown code blocks)
+                                if (jsonString.startsWith("```json")) {
+                                    jsonString = jsonString.substring(7, jsonString.length - 3).trim();
+                                } else if (jsonString.startsWith("```")) {
+                                     jsonString = jsonString.substring(3, jsonString.length - 3).trim();
+                                }
+                                const jsonMsg = JSON.parse(jsonString);
+                                messageHtml = `
+                                <div class="d-flex flex-row align-items-start mb-2"> <!-- Changed to align-items-start -->
+                                    <div class="message received shadow-box">
+                                        <div class="mb-0">
+                                            <div class="cn-text" style="display:block">${marked.parseInline(jsonMsg.cn || '')}</div>
+                                            <div class="translations" style="display:none;"> <!-- Initially hidden via style -->
+                                                🇫🇷 : ${marked.parseInline(jsonMsg.fr || '')}
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="d-flex flex-column align-items-center" style="z-index:1; margin-left: 5px;"> <!-- Added margin -->
+                                        <div class="no-close-keyboard audioIconContainer" data-audio-url="${jsonMsg.audio_url || ''}" onclick="playAudio(event)">
+                                            <svg class="svgAudiIconBtn" width="13" height="13"></svg>
+                                        </div>
+                                    </div>
+                                </div>`;
+                            } catch(e) {
+                                console.error("Error parsing assistant JSON:", e, "Original text:", msg.text);
+                                // Display raw text if parsing fails
+                                messageHtml = `
+                                <div class="d-flex flex-row align-items-start mb-2">
+                                    <div class="message received shadow-box">
+                                        <div class="mb-0">${marked.parseInline(msg.text)}</div>
+                                    </div>
+                                </div>`;
+                            }
+                        }
+                        if (messageHtml) {
+                            messagesHtml += messageHtml; // Append to the string
+                        }
+                    });
+
+                    // Prepend the whole batch of messages
+                    messageContainer.prepend(messagesHtml);
+
+                    // Re-attach handlers to newly added messages within the container
+                    attachMessageHandlers(messageContainer.find('.message.received:not(.handler-attached)'));
+
+                    // Adjust scroll
+                    const scrollHeightAfter = chatBox[0].scrollHeight;
+                    if (page > 1) {
+                        const heightDifference = scrollHeightAfter - scrollHeightBeforeLoad;
+                        chatBox.scrollTop(scrollTopBefore + heightDifference);
+                    } else {
+                        // Scroll to bottom only on initial load if needed
+                        // chatBox.scrollTop(scrollHeightAfter);
+                    }
+
+                    if (data.has_next) {
+                        currentPage++;
+                        hasMoreMessages = true;
+                    } else {
+                        hasMoreMessages = false;
+                        console.log("No more messages to load.");
+                        chatBox.off('scroll', scrollHandler); // Remove listener if no more messages
+                    }
+                } else {
+                    hasMoreMessages = false;
+                    console.log("No messages returned, assuming end of history.");
+                     chatBox.off('scroll', scrollHandler); // Remove listener
+                }
+                loadingMessages = false;
+            },
+            error: function(xhr) {
+                console.error("Erreur lors du chargement des messages", xhr);
+                loadingMessages = false;
+            }
+        });
+    }
+
+    // Function to attach handlers (click, long press) to messages
+    function attachMessageHandlers($messages) {
+        var longPressTimer;
+        var longPressThreshold = 600; // ms
+
+        $messages
+            .addClass('handler-attached') // Mark as processed
+            // Start long press timer
+            .on("mousedown touchstart", function(e) {
+                var $thisMessage = $(this);
+                clearTimeout(longPressTimer); // Clear any existing timer
+                longPressTimer = setTimeout(function() {
+                    // Long press action: Copy Chinese text
+                    var textToCopy = $thisMessage.find(".cn-text").text();
+                    navigator.clipboard.writeText(textToCopy).then(() => {
+                        console.log("Texte chinois copié:", textToCopy);
+                        // Optional: Show a visual confirmation (e.g., a toast)
+                        showToast("Chinese text copied!");
+                    }).catch(err => {
+                        console.error("Erreur copie:", err);
+                        showToast("Copy failed!");
+                    });
+                    e.handled = true; // Flag to prevent click
+                }, longPressThreshold);
+            })
+            // Clear timer on release/leave
+            .on("mouseup mouseleave touchend", function(e) {
+                clearTimeout(longPressTimer);
+            })
+            // Handle regular click (toggle translation)
+            .on("click", function(e) {
+                // Prevent click if long press happened
+                if (e.handled === true) {
+                    e.handled = false; // Reset flag
+                    return;
+                }
+                clearTimeout(longPressTimer); // Ensure timer is cleared on quick clicks
+
+                var translations = $(this).find(".translations");
+                if (translations.hasClass("show")) {
+                    // Hide
+                    translations.css("max-height", translations[0].scrollHeight + "px"); // Set current height
+                     requestAnimationFrame(() => { // Ensure height is set before transitioning
+                        translations.css({ "max-height": "0", "opacity": "0" });
+                     });
+                    setTimeout(() => {
+                         translations.removeClass("show").css("display", "none");
+                    }, 300); // Match transition duration
+                } else {
+                    // Show
+                    translations.css({ "display": "block", "max-height": "0", "opacity": "0" }); // Prepare for transition
+                     requestAnimationFrame(() => { // Ensure display:block is applied
+                         translations.css({ "max-height": translations[0].scrollHeight + "px", "opacity": "1" });
+                     });
+                     translations.addClass("show");
+                }
+            });
+    }
+
+    // --- Scroll handler for infinite scroll ---
+    function scrollHandler() {
+        const chatBox = $("#chat-content #chat-box");
+        if (!chatBox.length) return; // Exit if chatbox not visible/found
+
+        if (chatBox.scrollTop() < 50 && !loadingMessages && hasMoreMessages) {
+            console.log("Scroll triggered loading page:", currentPage);
+            loadMessages(currentPage);
+        }
+    }
+
+    // --- Send Message Function ---
+    async function sendMessage(event) {
+        event.preventDefault(); // Prevent form submission
+        let messageInput = $("#message-input");
+        let messageText = messageInput.val().trim();
+        if (messageText === "") return;
+
+        const chatBox = $("#chat-content #chat-box");
+        const messageContainer = chatBox.find(".message-container");
+
+        // Optimistic UI update (add user message immediately)
+        let sentMessageHtml = `
+            <div class="d-flex flex-column align-items-end mb-2">
+                <div class="message sent shadow-box">
+                    <div class="mb-0">${marked.parseInline(messageText)}</div>
+                </div>
+            </div>`;
+        messageContainer.append(sentMessageHtml);
+        chatBox.animate({ scrollTop: chatBox[0].scrollHeight }, 300); // Scroll to bottom
+        messageInput.val(""); // Clear input
+
+        // Send message via AJAX
+        try {
+            let response = await $.ajax({
+                url: '/send_message', // Your endpoint
+                type: 'POST',
+                contentType: 'application/json', // Send as JSON
+                data: JSON.stringify({ message: messageText }), // Correctly stringify
+                dataType: 'json' // Expect JSON response
+            });
+
+            if (response.error) {
+                console.error("Erreur:", response.error);
+                // Optionally show an error message in the chat
+                messageContainer.append(`
+                 <div class="d-flex flex-column align-items-start mb-2">
+                    <div class="message received error-message">
+                      Error: ${response.error}
+                    </div>
+                 </div>`);
+                 chatBox.animate({ scrollTop: chatBox[0].scrollHeight }, 300);
+                return;
+            }
+
+            // Process and display chatbot response
+            if (response.chatbot_message && response.chatbot_message.text) {
+                let chatbotMsg = response.chatbot_message;
+                let receivedMessageHtml = '';
+                 try {
+                      let jsonString = chatbotMsg.text.trim();
+                       if (jsonString.startsWith("```json")) {
+                           jsonString = jsonString.substring(7, jsonString.length - 3).trim();
+                       } else if (jsonString.startsWith("```")) {
+                           jsonString = jsonString.substring(3, jsonString.length - 3).trim();
+                       }
+                       const jsonMsg = JSON.parse(jsonString);
+                        receivedMessageHtml = `
+                        <div class="d-flex flex-row align-items-start mb-2">
+                            <div class="message received shadow-box">
+                                <div class="mb-0">
+                                    <div class="cn-text" style="display:block">${marked.parseInline(jsonMsg.cn || '')}</div>
+                                    <div class="translations" style="display:none;">
+                                        🇫🇷 : ${marked.parseInline(jsonMsg.fr || '')}
+                                    </div>
+                                </div>
+                            </div>
+                             <div class="d-flex flex-column align-items-center" style="z-index:1; margin-left: 5px;">
+                                <div class="no-close-keyboard audioIconContainer" data-audio-url="${jsonMsg.audio_url || ''}" onclick="playAudio(event)">
+                                    <svg class="svgAudiIconBtn" width="13" height="13"></svg>
+                                </div>
+                            </div>
+                        </div>`;
+                    } catch(e) {
+                        console.error("Error parsing received JSON:", e, "Raw text:", chatbotMsg.text);
+                         // Fallback to raw text
+                         receivedMessageHtml = `
+                          <div class="d-flex flex-row align-items-start mb-2">
+                             <div class="message received shadow-box">
+                                 <div class="mb-0">${marked.parseInline(chatbotMsg.text)}</div>
+                             </div>
+                          </div>`;
+                    }
+
+                let $newMessage = $(receivedMessageHtml);
+                messageContainer.append($newMessage);
+                attachMessageHandlers($newMessage.find('.message.received')); // Attach handlers to the new message
+                chatBox.animate({ scrollTop: chatBox[0].scrollHeight }, 300);
+            }
+
+        } catch (error) {
+            console.error("Erreur lors de l'envoi du message:", error);
+             messageContainer.append(`
+                 <div class="d-flex flex-column align-items-start mb-2">
+                    <div class="message received error-message">
+                       Failed to send message. Please try again.
+                    </div>
+                 </div>`);
+             chatBox.animate({ scrollTop: chatBox[0].scrollHeight }, 300);
+        }
+    }
+     // Function to play audio (Add this if you don't have one)
+     let currentAudio = null;
+     function playAudio(event) {
+        const container = event.currentTarget;
+        const audioUrl = container.dataset.audioUrl;
+        if (!audioUrl) {
+            console.warn("No audio URL found for this message.");
+            return;
+        }
+
+        if (currentAudio && !currentAudio.paused) {
+            currentAudio.pause();
+            currentAudio.currentTime = 0;
+             // Optional: Change icon back to play if needed
+             // $(currentAudio._iconContainer).find('svg').//... change mask image
+            if (currentAudio._audioUrl === audioUrl) {
+                 currentAudio = null; // Stop if clicking the same playing audio
+                 return;
+            }
+        }
+
+        currentAudio = new Audio(audioUrl);
+        currentAudio._audioUrl = audioUrl; // Store URL and container for reference
+        currentAudio._iconContainer = container;
+
+        // Optional: Change icon to 'pause' or 'playing' state
+         // $(container).find('svg').//... change mask image to pause icon
+
+        currentAudio.play().catch(e => console.error("Error playing audio:", e));
+
+        currentAudio.onended = () => {
+            // Optional: Change icon back to 'play' state
+             // $(container).find('svg').//... change mask image back to play icon
+            currentAudio = null;
+        };
+         currentAudio.onerror = (e) => {
+            console.error("Audio playback error:", e);
+            // Optional: Show error state on icon/message
+            currentAudio = null;
+        };
+     }
+     // Helper function for showing temporary messages (toasts)
+    function showToast(message) {
+        let toast = $('<div class="toast-message"></div>').text(message);
+        $('body').append(toast);
+        toast.fadeIn();
+        setTimeout(() => {
+            toast.fadeOut(() => toast.remove());
+        }, 2500); // Show for 2.5 seconds
+    }
+     // Add CSS for the toast messages
+     const toastStyle = document.createElement('style');
+     toastStyle.textContent = `
+        .toast-message {
+            position: fixed;
+            bottom: 70px; /* Adjust as needed */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.7);
+            color: white;
+            padding: 10px 20px;
+            border-radius: 20px;
+            z-index: 1050; /* Above most elements */
+            font-size: 0.9em;
+            display: none; /* Hidden initially */
+        }
+     `;
+     document.head.appendChild(toastStyle);
+
+
+    // --- NEW Navigation Logic ---
+    $(document).ready(function() {
+        const mainNav = $('#main-nav');
+        const navLinks = mainNav.find('a.nav-link[data-target]');
+        const contentSections = $('.content-section');
+
+        // Function to switch tabs
+        function switchTab(targetId) {
+            // Update Nav Link Active Class
+            navLinks.removeClass('active');
+            navLinks.filter(`[data-target="${targetId}"]`).addClass('active');
+
+            // Fade out all sections, then fade in the target one
+            contentSections.removeClass('active-content');
+            $('#' + targetId).addClass('active-content');
+
+            // --- Specific actions for chat tab ---
+            const chatBox = $("#chat-content #chat-box");
+            if (targetId === 'chat-content') {
+                // Load messages only if the container is empty (first time)
+                if (chatBox.find('.message-container').children().length === 0) {
+                     currentPage = 1; // Reset pagination
+                     hasMoreMessages = true; // Reset flag
+                     loadingMessages = false; // Reset flag
+                     loadMessages(currentPage); // Initial load
+                }
+                 // Attach scroll listener for infinite scroll
+                 chatBox.on('scroll', scrollHandler);
+                 // Scroll to bottom when switching to chat
+                 setTimeout(() => chatBox.scrollTop(chatBox[0].scrollHeight), 50); // Delay slightly
+
+            } else {
+                 // Remove scroll listener when leaving chat tab to avoid unnecessary checks
+                 chatBox.off('scroll', scrollHandler);
+            }
+
+             // --- Specific actions for home tab (e.g., ensure Live2D is visible) ---
+            const canvas = $('#live2d-canvas');
+             if(canvas.length) { // Check if canvas exists
+                if (targetId === 'home-content') {
+                    canvas.show(); // Or adjust visibility/z-index as needed
+                } else {
+                    canvas.hide(); // Hide canvas on other tabs
+                }
+             }
+        }
+
+        // Attach click handler to nav links
+        navLinks.on('click', function(e) {
+            e.preventDefault(); // Prevent default anchor behavior
+            const targetId = $(this).data('target');
+            const currentActive = $('.content-section.active-content').attr('id');
+
+            // Only switch if clicking a different tab
+            if (targetId && targetId !== currentActive) {
+                switchTab(targetId);
+            }
+        });
+
+        // Initial setup: Ensure correct section is shown on load
+        // and load initial chat messages if starting on chat tab (or default tab)
+        const initialTarget = $('.nav-link.active[data-target]').data('target') || 'home-content'; // Default to home
+        switchTab(initialTarget); // Call switchTab to handle initial state correctly
+
+         // Initial attach for any pre-loaded messages (if any)
+         attachMessageHandlers($('#chat-content #chat-box .message.received'));
+    });
+
+  </script>
+
+</body>
+</html>

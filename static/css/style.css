@@ -18,7 +18,7 @@
   z-index: 1;
   position: fixed;
   top: 0;
-  width: 100%;
+  width: 100vw;
   height: 60px;
   max-width: 520px;
   background-color: #FFFBE9;
@@ -64,10 +64,11 @@
 
  
 .chat-container {
+  overflow: hidden;
   position: absolute;
   width: 100%;
   max-width: 520px;
-  bottom: 0;
+bottom: 0 ;
   max-height: 55%;
   /* background:linear-gradient(to bottom, rgba(0, 0, 0, 0.604) -356%, rgba(88, 67, 110, 0.2) 717%); */
   background-color: #F4EAD5;

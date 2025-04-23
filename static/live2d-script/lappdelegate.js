@@ -126,11 +126,10 @@ export class LAppDelegate {
         this._canvases.prepareCapacity(LAppDefine.CanvasNum);
         this._subdelegates.prepareCapacity(LAppDefine.CanvasNum);
         for (let i = 0; i < LAppDefine.CanvasNum; i++) {
-            const canvas = document.createElement('canvas');
+            const canvas = document.querySelector('#canvas');
             this._canvases.pushBack(canvas);
             canvas.style.width = `${width}vw`;
             canvas.style.height = `${height}vh`;
-            document.body.appendChild(canvas);
         }
         for (let i = 0; i < this._canvases.getSize(); i++) {
             const subdelegate = new LAppSubdelegate();
